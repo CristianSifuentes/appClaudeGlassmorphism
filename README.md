@@ -66,6 +66,7 @@ In light mode the glass warms: higher opacity, amber tint, sepia shadow. The sam
 | ✓ | **Real contact backend** | Formspree integration. One `const FORM_ENDPOINT` at the top of `script.js`. Three states: `is-sending` (pulse animation), `is-sent` (green), `is-error` (rose + fallback email link). Status line fades up via `aria-live`. Demo mode when endpoint is empty. |
 | ✓ | **Ambient particle field** | 55-particle `<canvas>` constellation behind the orbs. Random-walk drift at ≤ 0.28 px/frame. Independent sine-wave breathing per particle. Constellation lines at ≤ 0.5px, fading with distance. Theme-colour lerp over ~2s. DPR-aware. `prefers-reduced-motion` silent. |
 | ✓ | **Blog / writing section** | Three glass cards rendered from `posts.js`. Markdown parsed client-side via `marked.js`. Full post opens in a reading modal with literary typography — blockquotes, inline code, `<hr>` dividers, comfortable 1.85 line-height. Separate GSAP stagger for dynamically rendered cards. |
+| ✓ | **PWA support** | `manifest.json` + service worker. Cache-first for local assets, stale-while-revalidate for CDN. Pre-caches the full reading experience on first visit. Offline navigation falls back to `index.html`. Installable to home screen. Theme-aware `theme-color` meta for native status bar. |
 | ✓ | **Glassmorphism card system** | `.glass` utility — backdrop blur, translucent fill, luminous border, soft shadow |
 | ✓ | **Floating hero card** | Sine-wave float animation with subtle 3-axis mouse tilt |
 | ✓ | **Scroll reveal** | `IntersectionObserver` — elements rise as they enter the viewport |
@@ -328,6 +329,58 @@ backdrop.addEventListener('transitionend', () => {
 
 ---
 
+## PWA Support — How It Works
+
+The portfolio remembers itself.
+
+When a visitor leaves and the network forgets them, the service worker — a quiet process living between the browser and the world — holds every file the portfolio needs to exist. The styles. The writing. The particles. The glass. When they return offline, the portfolio is there. Not a placeholder, not an error screen. The same surface, the same depth, the same frosted light — as though the absence of connection had changed nothing at all.
+
+**The manifest.** A small JSON file — `manifest.json` — tells the browser how to present the portfolio when it is installed to a home screen. The name, the icon, the theme colour. `display: standalone` removes the browser chrome: no address bar, no tabs. The installed version looks like an app — a window into the design, without the scaffolding of the web showing through. The launch background is `#0a0a0a`, the same near-black the portfolio opens with. Continuity, from icon tap to first render.
+
+**The icon.** An SVG — dark ground, two concentric glass circles at different radii and opacities, the initials *CS* in the accent colour. Precise, scalable to any resolution, indifferent to screen density. A monogram is not a logo. It is a signature.
+
+**The service worker.** Registered on page load and installed silently. On first visit with a connection, it pre-caches six local assets — `index.html`, `style.css`, `script.js`, `posts.js`, `manifest.json`, `icon.svg` — and the Google Fonts stylesheet. `Promise.allSettled` is used for the install: if one CDN asset is temporarily unreachable, the others still succeed. The install does not break for one failure. The portfolio still installs.
+
+**Cache strategy — two movements.** Same-origin files use **cache-first**: return the remembered copy immediately, consult the network only when there is no entry. The portfolio's own files do not change between visits; there is no reason to wait for the network. CDN assets — GSAP, marked.js, Google Fonts files — use **stale-while-revalidate**: serve the cached version instantly (fast), fetch a fresh copy in the background (current). Speed and freshness, balanced against each other.
+
+**Offline navigation.** If the reader opens the portfolio without a connection and no cached response exists for the URL, the service worker falls back to `./index.html`. The portfolio shell loads. The glass holds. The writing is there. The portfolio was always already present — the network was only ever a delivery mechanism for the first visit.
+
+**Cache versioning.** The cache is named `cs-portfolio-v1`. On activate, every cache whose name does not match is deleted — old glass, cleared. When assets change, increment the version string. The next visit brings the new cache; the old one is released without ceremony.
+
+**Theme-aware status bar.** Two `<meta name="theme-color">` tags — one scoped to `prefers-color-scheme: dark`, one to `light` — match the browser chrome and native status bar to the portfolio's current palette. In dark mode: `#0a0a0a`, the same as the background. In light mode: `#ede8df`, the same warm parchment. Whether the portfolio lives in the browser or on the home screen, the interface extends without a seam.
+
+```js
+// The guardian registers silently — no error is user-facing
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+```
+
+```js
+// Cache-first: serve memory; the network is only for what memory does not hold
+async function cacheFirst(request) {
+  const cached = await caches.match(request);
+  if (cached) return cached;                     // remembered — serve it
+  const response = await fetch(request);         // new — fetch and remember
+  if (response.ok) caches.open(CACHE).then((c) => c.put(request, response.clone()));
+  return response;
+}
+
+// Stale-while-revalidate: fast now, fresh next time
+async function staleWhileRevalidate(request) {
+  const cache  = await caches.open(CACHE);
+  const cached = await cache.match(request);
+  const fetchPromise = fetch(request)
+    .then((r) => { if (r.ok) cache.put(request, r.clone()); return r; })
+    .catch(() => cached);                        // network failure: the cache is enough
+  return cached || fetchPromise;                 // cached → instant; uncached → wait
+}
+```
+
+---
+
 ## Quick Start
 
 ```bash
@@ -347,6 +400,9 @@ glassmorphism-portfolio/
 ├── style.css      design token system, glass utility, both themes, markdown typography
 ├── script.js      magnetic cursor, typed headline, theme toggle, particles, modals, blog
 ├── posts.js       writing content — add new entries here, Markdown rendered at runtime
+├── manifest.json  PWA manifest — app identity, icons, theme colour, display mode
+├── sw.js          service worker — cache-first strategy, offline reading
+├── icon.svg       app icon — CS monogram on dark glass, used for home-screen install
 ├── README.md      you are here
 └── LICENSE
 ```
@@ -468,7 +524,7 @@ Ordered by emotional impact on the viewer.
 - [x] **Real contact backend** — wire the form to Formspree or EmailJS; one environment variable
 - [x] **Ambient particle field** — a slow, sparse `<canvas>` constellation behind the orbs
 - [x] **Blog / writing section** — thoughts rendered from Markdown; the voice behind the work
-- [ ] **PWA support** — `manifest.json` and a service worker for offline reading
+- [x] **PWA support** — `manifest.json` and a service worker for offline reading
 - [ ] **Multilingual support** — a second language, a second self
 - [ ] **Image optimisation** — WebP with `srcset`, native lazy loading
 
