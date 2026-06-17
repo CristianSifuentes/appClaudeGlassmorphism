@@ -65,6 +65,7 @@ In light mode the glass warms: higher opacity, amber tint, sepia shadow. The sam
 | ✓ | **Staggered section transitions** | GSAP + ScrollTrigger. Hero fades in on load. Every section below the fold staggers its children at 80ms intervals, `power3.out`. `clearProps: 'transform'` hands control back to card-tilt. CDN-fail and `prefers-reduced-motion` safe. |
 | ✓ | **Real contact backend** | Formspree integration. One `const FORM_ENDPOINT` at the top of `script.js`. Three states: `is-sending` (pulse animation), `is-sent` (green), `is-error` (rose + fallback email link). Status line fades up via `aria-live`. Demo mode when endpoint is empty. |
 | ✓ | **Ambient particle field** | 55-particle `<canvas>` constellation behind the orbs. Random-walk drift at ≤ 0.28 px/frame. Independent sine-wave breathing per particle. Constellation lines at ≤ 0.5px, fading with distance. Theme-colour lerp over ~2s. DPR-aware. `prefers-reduced-motion` silent. |
+| ✓ | **Blog / writing section** | Three glass cards rendered from `posts.js`. Markdown parsed client-side via `marked.js`. Full post opens in a reading modal with literary typography — blockquotes, inline code, `<hr>` dividers, comfortable 1.85 line-height. Separate GSAP stagger for dynamically rendered cards. |
 | ✓ | **Glassmorphism card system** | `.glass` utility — backdrop blur, translucent fill, luminous border, soft shadow |
 | ✓ | **Floating hero card** | Sine-wave float animation with subtle 3-axis mouse tilt |
 | ✓ | **Scroll reveal** | `IntersectionObserver` — elements rise as they enter the viewport |
@@ -154,6 +155,41 @@ themeToggle.addEventListener('click', () => {
   setTimeout(() => html.classList.remove('theme-transitioning'), 700);
 });
 ```
+
+---
+
+## Blog / Writing Section — How It Works
+
+A portfolio has a visible face — the projects, the skills, the contact form. The writing section is the voice behind that face. Three glass cards, each holding the first sentence of a thought. The rest is sealed until the reader chooses to open it. The same gesture as the project modals: click, world blurs, something rises. But the reading experience inside is different — quieter, longer, measured for prose rather than information.
+
+**The data separation.** Posts live in `posts.js` — a plain array of objects, one per entry. The markdown content is a template literal string, multi-line, with no build tooling. To add a new post: append one object. To edit: change the string. `posts.js` is the only file Cristian needs to touch to maintain his writing. `script.js` does not need to be opened.
+
+**Markdown rendered client-side.** `marked.js` (loaded from CDN) parses each post's `content` field to HTML at the moment the reader opens a post — not on page load. The parsing is deferred: the card view shows only a static excerpt string, and `marked.parse()` runs only on click. If `marked.js` fails to load, a plain-text fallback splits on double newlines and wraps each paragraph in `<p>` tags. The post is always readable.
+
+**The reading modal.** The post reader reuses the same glass overlay system as the project modals — `.modal-backdrop`, `.modal-glass`, `.modal-scroll`, `.modal-close` — because the gesture is the same. What changes is the content area: a `<article class="post-reader">` with a typeset header (meta line → title) and a `.post-body` div where the rendered markdown lands. The panel widens slightly (`max-width: 720px` vs 680px) for a more comfortable reading measure.
+
+**Markdown typography.** Each element in `.post-body` is typeset for extended reading, not scanning. Paragraphs at 1.85 line-height. The blockquote — the element that carries the melancholic voice — is bordered by a 2px accent line on the left, italicised, set in muted colour. It is a sentence that earned its own room. Horizontal rules become 1px accent lines, breathing between thoughts. Inline code is glass-tinted. All colours respond to the theme system via CSS custom properties.
+
+**The stagger problem.** The main GSAP stagger IIFE runs on page load, before the blog IIFE has rendered its cards. It finds only the static `.section-header.reveal` in `#writing`. The post cards, rendered dynamically, are invisible to that first pass. The blog IIFE solves this by creating its own `ScrollTrigger` for `#writing`, pointing at the newly rendered cards, with a `delay: 0.08s` — one stagger step after the header. The result: header arrives, then cards follow in sequence.
+
+**Adding new posts.** Open `posts.js`. Append:
+```js
+{
+  slug:     'your-slug',
+  date:     '2026-05-10',
+  title:    'Your Title',
+  excerpt:  'The first sentence, or two. Shown on the card.',
+  readTime: '4 min',
+  content: `
+Your full post in **Markdown**.
+
+> A blockquote earns its own room.
+
+Nothing else needs to change.
+`,
+},
+```
+The card renders, the reader opens, the modal works. One file, one object, one post.
 
 ---
 
@@ -308,8 +344,9 @@ xdg-open index.html   # Linux
 ```
 glassmorphism-portfolio/
 ├── index.html     main HTML — all sections live here
-├── style.css      design token system, glass utility, both themes
-├── script.js      magnetic cursor, typed headline, theme toggle, reveal, skill bars, card tilt
+├── style.css      design token system, glass utility, both themes, markdown typography
+├── script.js      magnetic cursor, typed headline, theme toggle, particles, modals, blog
+├── posts.js       writing content — add new entries here, Markdown rendered at runtime
 ├── README.md      you are here
 └── LICENSE
 ```
@@ -430,7 +467,7 @@ Ordered by emotional impact on the viewer.
 - [x] **Staggered section transitions** — sections drift in with GSAP timelines, each child delayed by 80ms
 - [x] **Real contact backend** — wire the form to Formspree or EmailJS; one environment variable
 - [x] **Ambient particle field** — a slow, sparse `<canvas>` constellation behind the orbs
-- [ ] **Blog / writing section** — thoughts rendered from Markdown; the voice behind the work
+- [x] **Blog / writing section** — thoughts rendered from Markdown; the voice behind the work
 - [ ] **PWA support** — `manifest.json` and a service worker for offline reading
 - [ ] **Multilingual support** — a second language, a second self
 - [ ] **Image optimisation** — WebP with `srcset`, native lazy loading
