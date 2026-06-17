@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alex Morgan — Designer & Developer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Background orbs -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- ── Navigation ── -->
+  <nav>
+    <div class="container nav-inner">
+      <a class="nav-logo" href="#hero">Alex<span>.</span></a>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#work">Work</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-content">
+
+        <!-- Left: text -->
+        <div class="hero-text reveal">
+          <span class="label">Available for freelance</span>
+          <h1>
+            Hi, I'm <span class="name">Alex Morgan</span> — I design &amp; build digital experiences.
+          </h1>
+          <p>
+            Full-stack developer and UI designer crafting clean, accessible products
+            that live at the intersection of function and beauty.
+          </p>
+          <div class="hero-actions">
+            <a href="#work" class="btn-primary">View my work →</a>
+            <a href="#contact" class="btn-ghost">Get in touch</a>
+          </div>
+        </div>
+
+        <!-- Right: glass profile card -->
+        <div class="glass hero-card reveal">
+          <div style="display:flex;align-items:center;gap:18px;">
+            <div class="hero-card-avatar">AM</div>
+            <div class="hero-card-info">
+              <h3>Alex Morgan</h3>
+              <p>Design Engineer · Remote</p>
+            </div>
+          </div>
+          <div class="hero-card-divider"></div>
+          <div class="hero-stats">
+            <div>
+              <span class="stat-value">6+</span>
+              <span class="stat-label">Years exp.</span>
+            </div>
+            <div>
+              <span class="stat-value">42</span>
+              <span class="stat-label">Projects</span>
+            </div>
+            <div>
+              <span class="stat-value">18</span>
+              <span class="stat-label">Clients</span>
+            </div>
+          </div>
+          <div class="hero-card-divider"></div>
+          <div class="hero-card-tags">
+            <span class="tag">React</span>
+            <span class="tag">TypeScript</span>
+            <span class="tag">Figma</span>
+            <span class="tag">Node.js</span>
+            <span class="tag">Motion</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── About ── -->
+  <section id="about">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">About me</span>
+        <h2>Blending craft with engineering</h2>
+        <p>I care deeply about the details — from pixel-perfect layouts to clean, maintainable code.</p>
+      </div>
+
+      <div class="about-grid">
+
+        <div class="glass about-card reveal">
+          <div class="about-card-icon">🎨</div>
+          <h3>Design first</h3>
+          <p>
+            Every project starts in Figma. I focus on clarity, hierarchy, and visual rhythm
+            before writing a single line of code. Good design is invisible.
+          </p>
+        </div>
+
+        <div class="glass about-card reveal">
+          <div class="about-card-icon">⚡</div>
+          <h3>Performance obsessed</h3>
+          <p>
+            Beautiful interfaces mean nothing if they're slow. I optimize for Core Web Vitals,
+            bundle sizes, and perceptual performance from day one.
+          </p>
+        </div>
+
+        <div class="glass about-card reveal">
+          <div class="about-card-icon">♿</div>
+          <h3>Accessibility built-in</h3>
+          <p>
+            Semantic HTML, keyboard navigation, and ARIA aren't afterthoughts — they're part
+            of my standard workflow on every project.
+          </p>
+        </div>
+
+        <div class="glass about-card reveal">
+          <div class="about-card-icon">🤝</div>
+          <h3>Collaborative by nature</h3>
+          <p>
+            I thrive in cross-functional teams. I'm comfortable in Figma reviews,
+            engineering standups, and client calls alike.
+          </p>
+        </div>
+
+        <!-- Skills bar spanning full width -->
+        <div class="glass skills-section reveal">
+          <h3>Core skills</h3>
+          <div class="skill-item">
+            <div class="skill-header"><span>UI / UX Design</span><span>92%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-width="92%"></div></div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-header"><span>React / TypeScript</span><span>88%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-width="88%"></div></div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-header"><span>Node.js / REST APIs</span><span>80%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-width="80%"></div></div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-header"><span>CSS / Animation</span><span>95%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-width="95%"></div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Work ── -->
+  <section id="work">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Selected work</span>
+        <h2>Projects I'm proud of</h2>
+        <p>A handful of recent projects — each one solving a real problem with clean design.</p>
+      </div>
+
+      <div class="projects-grid">
+
+        <div class="glass project-card reveal">
+          <div class="project-image">📊</div>
+          <h3>Luminary — Analytics Dashboard</h3>
+          <p>
+            End-to-end design and frontend build for a B2B SaaS analytics platform.
+            Real-time charts, dark mode, and a component library from scratch.
+          </p>
+          <div class="project-tags">
+            <span class="tag">React</span>
+            <span class="tag">Recharts</span>
+            <span class="tag">Figma</span>
+          </div>
+          <a href="#" class="project-link">View case study →</a>
+        </div>
+
+        <div class="glass project-card reveal">
+          <div class="project-image">🌿</div>
+          <h3>Verdant — E-commerce Store</h3>
+          <p>
+            Shopify storefront redesign for a sustainable lifestyle brand. Improved
+            conversion rate by 34% through UX audit and checkout flow optimisation.
+          </p>
+          <div class="project-tags">
+            <span class="tag">Shopify</span>
+            <span class="tag">Liquid</span>
+            <span class="tag">GSAP</span>
+          </div>
+          <a href="#" class="project-link">View case study →</a>
+        </div>
+
+        <div class="glass project-card reveal">
+          <div class="project-image">📱</div>
+          <h3>Pulse — Fitness Mobile App</h3>
+          <p>
+            React Native app for a personal training startup. Custom animation system,
+            offline support, and a design system used across iOS and Android.
+          </p>
+          <div class="project-tags">
+            <span class="tag">React Native</span>
+            <span class="tag">Expo</span>
+            <span class="tag">Reanimated</span>
+          </div>
+          <a href="#" class="project-link">View case study →</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Contact ── -->
+  <section id="contact">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Get in touch</span>
+        <h2>Let's build something together</h2>
+        <p>Open to freelance projects, full-time roles, and interesting collaborations.</p>
+      </div>
+
+      <div class="glass contact-card reveal">
+        <form class="contact-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input id="name" type="text" placeholder="Your name" required />
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input id="email" type="email" placeholder="your@email.com" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <input id="subject" type="text" placeholder="What's this about?" />
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" placeholder="Tell me about your project..." required></textarea>
+          </div>
+          <button type="submit" class="btn-submit">Send message</button>
+        </form>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <div class="container">
+      <p>
+        &copy; 2026 Alex Morgan &mdash; Built with glassmorphism &amp; good taste.
+        <br />
+        <a href="mailto:hello@alexmorgan.dev">hello@alexmorgan.dev</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
