@@ -61,6 +61,7 @@ In light mode the glass warms: higher opacity, amber tint, sepia shadow. The sam
 | ✓ | **Dark / Light theme toggle** | Glass pill toggle with spring-physics thumb. System preference detected on first load, `localStorage` for persistence. Crossfading dual-layer gradient background. Orbs shift from cool cobalt to warm amber dust. |
 | ✓ | **Magnetic cursor** | Custom dot + trailing glow. Quadratic gravitational pull toward glass cards. `mix-blend-mode: screen` in dark mode; normalises in light. Silent on touch devices. |
 | ✓ | **Typed headline** | Hero h1 cycles through five roles. Recursive `setTimeout`, variable character timing, 2800ms held pause per word. 2px blinking cursor. `prefers-reduced-motion` safe. |
+| ✓ | **Project detail modals** | Click a card; the world blurs into a glass overlay. Backdrop `backdrop-filter` transitions from `blur(0)` to `blur(20px)`. Panel enters at `scale(0.94)` and rises. Escape / outside-click closes. Focus trapped, scroll locked. |
 | ✓ | **Glassmorphism card system** | `.glass` utility — backdrop blur, translucent fill, luminous border, soft shadow |
 | ✓ | **Floating hero card** | Sine-wave float animation with subtle 3-axis mouse tilt |
 | ✓ | **Scroll reveal** | `IntersectionObserver` — elements rise as they enter the viewport |
@@ -153,6 +154,38 @@ themeToggle.addEventListener('click', () => {
 
 ---
 
+## Project Detail Modals — How It Works
+
+Click a card and the rest of the world does not go dark — it *blurs*. This distinction matters. Black is an ending. Blur is a deepening. The page is still there, still breathing, just held softly out of focus while you attend to this one thing. When you close the modal, the world reassembles, gently, behind you.
+
+**The world softening.** The modal backdrop is a full-viewport fixed layer with a CSS `backdrop-filter`. At rest it is `blur(0px)`, invisible. When the modal opens, it transitions to `blur(20px)` over 440ms — not a snap, a gradual recession. The orbs, the cards, the text: all dissolve to impressionism while you read. The closing animation reverses this: the world returns.
+
+**The panel rising.** The glass panel enters at `scale(0.94) translateY(28px)` — slightly small, slightly low, like something emerging from behind the surface. It scales to `1.0` and rises `28px` over 460ms on a spring cubic-bezier (`0.34, 1.26, 0.64, 1`), a trace of overshoot that makes it feel as though it has *arrived* rather than appeared. The opacity follows at 380ms ease. The closing is the reverse: a quiet descent, the panel retreating back into the surface it came from.
+
+**The content.** The modal reads its content directly from the clicked card's DOM — no duplication, no data attributes for the basic fields. The emoji, title, short description, and tech tags are all extracted from the existing markup. A `data-detail` attribute on each card holds the extended prose — the deeper story, set in italics, separated from the preview text by a hairline border. Two registers: the immediate impression, and the quiet detail.
+
+**Scroll lock.** While the modal is open, `overflow: hidden` is applied to `body`, with `padding-right` matched to the scrollbar width to prevent layout shift. The modal itself scrolls internally via a flex-child `.modal-scroll` with `min-height: 0` — the invariant that makes flex overflow work correctly.
+
+**Accessibility.** The close button receives focus on open (`setTimeout` deferred past the animation frame). `Escape` closes. Clicking the blurred backdrop area (outside the panel) closes. `aria-hidden` on the backdrop is removed while open and restored after the close transition completes via a `transitionend` listener. Cards carry `role="button"`, `tabindex="0"`, and `aria-haspopup="dialog"` so keyboard users can navigate and activate them.
+
+**The cursor.** Project cards (`role="button"`) are added to the interactive cursor selector — the dot tightens and the glow expands when hovering, signalling affordance without a native cursor.
+
+```js
+// The world blurs in — not a snap, a 440ms recession
+backdrop.classList.add('is-open');   // triggers: opacity 0→1, backdrop-filter 0→blur(20px)
+
+// Panel rises — spring overshoot, feels like it arrived
+// CSS: transform: scale(0.94) translateY(28px) → scale(1) translateY(0)
+//      cubic-bezier(0.34, 1.26, 0.64, 1)
+
+// The world returns gently — transitionend for clean aria-hidden restore
+backdrop.addEventListener('transitionend', () => {
+  backdrop.setAttribute('aria-hidden', 'true');
+}, { once: true });
+```
+
+---
+
 ## Quick Start
 
 ```bash
@@ -230,6 +263,10 @@ The light-mode accent lives in `[data-theme="light"]` and follows the same patte
 | **Pause after full word** | Word complete | 2800ms | The long breath |
 | **Pause after full erase** | Word erased | 420ms | The short breath |
 | **Cursor blink** | Idle / pause | 1060ms cycle | `ease-in-out` |
+| **Modal backdrop fade** | Card click | 440ms | `ease` |
+| **Modal backdrop blur** | Card click | 440ms | `ease` — `blur(0)` → `blur(20px)` |
+| **Modal panel rise** | Card click | 460ms | Spring `cubic-bezier(0.34,1.26,0.64,1)` |
+| **Modal close descent** | Escape / close btn | 440ms | Reverse of open |
 | Scroll reveal | Enter viewport | 700ms | `ease` |
 | Skill bar fill | Section visible | 1200ms | `cubic-bezier(0.25,0.8,0.25,1)` |
 | Card tilt | Mouse move | 100ms | `ease` |
@@ -272,7 +309,7 @@ Ordered by emotional impact on the viewer.
 - [x] **Dark / Light theme toggle** — spring toggle, crossfading gradient layers, system preference, `localStorage`
 - [x] **Magnetic cursor** — dot + trailing glow, quadratic glass attraction, `mix-blend-mode: screen`, touch-safe
 - [x] **Typed headline** — recursive `setTimeout`, five roles, 2800ms held pause, 2px blinking cursor, reduced-motion safe
-- [ ] **Project detail modals** — click a card; the world behind it blurs into a glass overlay
+- [x] **Project detail modals** — click a card; the world behind it blurs into a glass overlay
 - [ ] **Staggered section transitions** — sections drift in with GSAP timelines, each child delayed by 80ms
 - [ ] **Real contact backend** — wire the form to Formspree or EmailJS; one environment variable
 - [ ] **Ambient particle field** — a slow, sparse `<canvas>` constellation behind the orbs
