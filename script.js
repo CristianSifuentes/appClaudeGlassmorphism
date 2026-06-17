@@ -129,6 +129,83 @@ themeToggle.addEventListener('click', () => {
   tick();
 }());
 
+// ─── Typewriter headline ─────────────────────────────────────────
+// Each role arrives letter by letter. A long pause — a held note,
+// a breath — before the slow erasure. Then silence, then the next.
+(function () {
+  const textEl   = document.getElementById('typedText');
+  const cursorEl = document.getElementById('typedCursor');
+  if (!textEl || !cursorEl) return;
+
+  // Reduced motion: show the first role statically, hide the cursor
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    textEl.textContent = 'a design engineer.';
+    cursorEl.style.display = 'none';
+    return;
+  }
+
+  // Five roles — each one a true, slightly different answer
+  const roles = [
+    'a design engineer.',
+    'a frontend sculptor.',
+    'a builder of careful things.',
+    'a visual architect.',
+    'a pixel poet.',
+  ];
+
+  const TYPE_MIN    =  55;  // ms — minimum time between typed characters
+  const TYPE_MAX    =  95;  // ms — maximum time (randomness = humanity)
+  const ERASE_MIN   =  35;  // ms — erasing is quicker, more mechanical
+  const ERASE_MAX   =  60;  // ms
+  const PAUSE_FULL  = 2800; // ms — the long breath after a complete word
+  const PAUSE_EMPTY =  420; // ms — the shorter breath before the next begins
+
+  const rand = (lo, hi) => lo + Math.random() * (hi - lo);
+
+  let role      = 0;
+  let charIndex = 0;
+  let erasing   = false;
+
+  function tick() {
+    const current = roles[role];
+
+    if (!erasing) {
+      // ── Typing: one character arrives ──────────────────────────
+      cursorEl.classList.add('is-typing'); // cursor holds still — full attention
+      charIndex++;
+      textEl.textContent = current.slice(0, charIndex);
+
+      if (charIndex === current.length) {
+        // The full word is here — hold, let it be seen, then let it go
+        cursorEl.classList.remove('is-typing');
+        erasing = true;
+        setTimeout(tick, PAUSE_FULL);
+        return;
+      }
+      setTimeout(tick, rand(TYPE_MIN, TYPE_MAX));
+
+    } else {
+      // ── Erasing: one character departs ─────────────────────────
+      cursorEl.classList.add('is-typing'); // cursor holds still while erasing
+      charIndex--;
+      textEl.textContent = current.slice(0, charIndex);
+
+      if (charIndex === 0) {
+        // The word is gone — silence, then the next one will come
+        cursorEl.classList.remove('is-typing');
+        erasing = false;
+        role    = (role + 1) % roles.length;
+        setTimeout(tick, PAUSE_EMPTY);
+        return;
+      }
+      setTimeout(tick, rand(ERASE_MIN, ERASE_MAX));
+    }
+  }
+
+  // Begin after the hero reveal settles (≈700ms transition) + a short breath
+  setTimeout(tick, 1200);
+}());
+
 // ─── Nav scroll effect ─────────────────────────────────────────
 const nav = document.querySelector('nav');
 window.addEventListener('scroll', () => {
