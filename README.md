@@ -59,12 +59,40 @@ In light mode the glass warms: higher opacity, amber tint, sepia shadow. The sam
 | | Feature | Description |
 |---|---|---|
 | ✓ | **Dark / Light theme toggle** | Glass pill toggle with spring-physics thumb. System preference detected on first load, `localStorage` for persistence. Crossfading dual-layer gradient background. Orbs shift from cool cobalt to warm amber dust. |
+| ✓ | **Magnetic cursor** | Custom dot + trailing glow. Quadratic gravitational pull toward glass cards. `mix-blend-mode: screen` in dark mode; normalises in light. Silent on touch devices. |
 | ✓ | **Glassmorphism card system** | `.glass` utility — backdrop blur, translucent fill, luminous border, soft shadow |
 | ✓ | **Floating hero card** | Sine-wave float animation with subtle 3-axis mouse tilt |
 | ✓ | **Scroll reveal** | `IntersectionObserver` — elements rise as they enter the viewport |
 | ✓ | **Animated skill bars** | Fill on scroll entry via `data-width`; eased cubic-bezier fill |
 | ✓ | **Responsive layout** | CSS Grid, `clamp()` fluid type, graceful mobile collapse |
 | ✓ | **Contact form feedback** | Submit state with colour confirmation and auto-reset |
+
+---
+
+## Magnetic Cursor — How It Works
+
+The cursor is two elements: a small, precise `.cursor-dot` that the eye follows, and a larger `.cursor-glow` that drifts behind it — slower, heavier, like light spilled on water. Neither moves with `transform` in the animation loop; `left`/`top` are set each frame so `transform: translate(-50%, -50%)` can stay as a static centering rule, untouched.
+
+**The moth effect:** each glass card defines a field of attraction. At 140px radius, the pull is zero. At the centre, it reaches 32% of the remaining distance. The falloff is quadratic — `(1 - dist/R)²` — so the approach feels gravitational rather than mechanical. The closer the cursor, the stronger the pull. The moth drawn to the light.
+
+**The trail:** the dot lerps toward the magnetic target at `t = 0.50` per frame — quick but not instant, like a finger dragged through water. The glow lerps toward the dot at `t = 0.07` — much slower, half a second of drift before it settles. The separation between them is the whole feeling: precision leading, warmth following.
+
+**Blend mode:** in dark mode, `mix-blend-mode: screen` on the dot lets it pass through surfaces without a hard edge — it glows rather than sits. On a light background, screen blends to near-invisible, so `[data-theme="light"]` switches it to `normal`.
+
+**Touch safety:** the entire system is wrapped in a media query check — `(hover: hover) and (pointer: fine)` — so it never activates on phones or tablets. No orphaned invisible `cursor: none` on touch devices.
+
+```js
+// Quadratic pull — the closer, the stronger
+const pull = Math.pow(1 - dist / MAGNETIC_RADIUS, 2) * MAGNETIC_STRENGTH;
+targetX   += (cx - mouseX) * pull;
+targetY   += (cy - mouseY) * pull;
+
+// Dot follows: quick, tethered
+dotX = lerp(dotX, targetX, 0.50);
+
+// Glow follows the dot: slow, like spilled light
+glowX = lerp(glowX, dotX, 0.07);
+```
 
 ---
 
@@ -109,7 +137,7 @@ xdg-open index.html   # Linux
 glassmorphism-portfolio/
 ├── index.html     main HTML — all sections live here
 ├── style.css      design token system, glass utility, both themes
-├── script.js      theme toggle, reveal, skill bars, card tilt
+├── script.js      magnetic cursor, theme toggle, reveal, skill bars, card tilt
 ├── README.md      you are here
 └── LICENSE
 ```
@@ -158,8 +186,12 @@ The light-mode accent lives in `[data-theme="light"]` and follows the same patte
 | Animation | Trigger | Duration | Easing |
 |---|---|---|---|
 | Theme crossfade | Toggle click | 700ms | `ease` |
-| Toggle thumb slide | Toggle click | 520ms | Spring overshoot |
+| Toggle thumb slide | Toggle click | 520ms | Spring overshoot `cubic-bezier(0.34,1.56,0.64,1)` |
 | Orb colour shift | Theme switch | 700ms | `ease` |
+| **Cursor dot** | Mouse move (RAF) | per-frame lerp `t=0.50` | Organic lag |
+| **Cursor glow trail** | Follows dot (RAF) | per-frame lerp `t=0.07` | Heavy drift |
+| **Cursor near glass** | 140px proximity | 250ms dot / 550ms glow | `ease` |
+| **Cursor blend** | Theme switch | 450ms | `ease` |
 | Scroll reveal | Enter viewport | 700ms | `ease` |
 | Skill bar fill | Section visible | 1200ms | `cubic-bezier(0.25,0.8,0.25,1)` |
 | Card tilt | Mouse move | 100ms | `ease` |
@@ -200,7 +232,7 @@ Netlify and Vercel work identically — connect the repository and deploy. No bu
 Ordered by emotional impact on the viewer.
 
 - [x] **Dark / Light theme toggle** — spring toggle, crossfading gradient layers, system preference, `localStorage`
-- [ ] **Magnetic cursor** — a soft glow that follows the mouse, drawn toward glass cards like a moth to light
+- [x] **Magnetic cursor** — dot + trailing glow, quadratic glass attraction, `mix-blend-mode: screen`, touch-safe
 - [ ] **Typed headline** — the hero `h1` cycles through roles with a typewriter cursor and a long pause between
 - [ ] **Project detail modals** — click a card; the world behind it blurs into a glass overlay
 - [ ] **Staggered section transitions** — sections drift in with GSAP timelines, each child delayed by 80ms
