@@ -307,20 +307,72 @@ window.addEventListener('scroll', () => {
   nav.classList.toggle('scrolled', window.scrollY > 40);
 });
 
-// ─── Scroll reveal ─────────────────────────────────────────────
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        revealObserver.unobserve(entry.target);
-      }
+// ─── Staggered section transitions ──────────────────────────────
+// Sections do not arrive. They assemble — each child drifting into
+// place in turn, like objects being set down with deliberate care.
+// The 80ms gap between each element is the space between thoughts:
+// long enough to feel, short enough that the whole still coheres.
+(function () {
+  // If GSAP didn't load from CDN, reveal everything immediately
+  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+    document.querySelectorAll('.reveal').forEach((el) => {
+      el.style.opacity = '1';
+      el.style.transform = 'none';
     });
-  },
-  { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
-);
+    return;
+  }
 
-document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+  // Reduced motion: show all at once without animation
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    gsap.set('.reveal', { opacity: 1, y: 0, clearProps: 'all' });
+    return;
+  }
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // ── Hero — above the fold, animates on page load ─────────────────
+  // The text is ready when the typewriter begins. The card settles
+  // just after, carrying the weight of the introduction.
+  const heroItems = Array.from(document.querySelectorAll('#hero .reveal'));
+  if (heroItems.length) {
+    gsap.set(heroItems, { opacity: 0, y: 24 });
+    gsap.to(heroItems, {
+      opacity:    1,
+      y:          0,
+      duration:   0.90,
+      ease:       'power2.out',
+      stagger:    0.18,
+      delay:      0.22,
+      clearProps: 'transform',
+    });
+  }
+
+  // ── All sections below the fold — drift in on scroll ─────────────
+  // Each section assembles its children one by one. Not all at once —
+  // that would be noise. One. Then the next. Then the next. A cadence.
+  document.querySelectorAll('section:not(#hero)').forEach((section) => {
+    const items = Array.from(section.querySelectorAll('.reveal'));
+    if (!items.length) return;
+
+    gsap.set(items, { opacity: 0, y: 28 });
+
+    ScrollTrigger.create({
+      trigger: section,
+      start:   'top 84%',
+      once:    true,
+      onEnter() {
+        gsap.to(items, {
+          opacity:    1,
+          y:          0,
+          duration:   0.85,                  // the time of one slow breath
+          ease:       'power3.out',          // settles into place, not bounces
+          stagger:    0.08,                  // 80ms — the specified cadence
+          clearProps: 'transform',           // release to card-tilt after reveal
+        });
+      },
+    });
+  });
+}());
 
 // ─── Skill bars ─────────────────────────────────────────────────
 const skillObserver = new IntersectionObserver(

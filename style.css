@@ -1226,15 +1226,16 @@ footer a {
 }
 
 /* ─── Scroll reveal ────────────────────────────────────────────── */
+/* Initial hidden state. GSAP owns the animation — no CSS transition
+   needed here. If GSAP fails, the JS fallback reveals all elements
+   inline. Reduced-motion users see content immediately via CSS. */
 .reveal {
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
 }
 
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; }
 }
 
 /* ─── Responsive ───────────────────────────────────────────────── */
