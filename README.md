@@ -63,6 +63,7 @@ In light mode the glass warms: higher opacity, amber tint, sepia shadow. The sam
 | ✓ | **Typed headline** | Hero h1 cycles through five roles. Recursive `setTimeout`, variable character timing, 2800ms held pause per word. 2px blinking cursor. `prefers-reduced-motion` safe. |
 | ✓ | **Project detail modals** | Click a card; the world blurs into a glass overlay. Backdrop `backdrop-filter` transitions from `blur(0)` to `blur(20px)`. Panel enters at `scale(0.94)` and rises. Escape / outside-click closes. Focus trapped, scroll locked. |
 | ✓ | **Staggered section transitions** | GSAP + ScrollTrigger. Hero fades in on load. Every section below the fold staggers its children at 80ms intervals, `power3.out`. `clearProps: 'transform'` hands control back to card-tilt. CDN-fail and `prefers-reduced-motion` safe. |
+| ✓ | **Real contact backend** | Formspree integration. One `const FORM_ENDPOINT` at the top of `script.js`. Three states: `is-sending` (pulse animation), `is-sent` (green), `is-error` (rose + fallback email link). Status line fades up via `aria-live`. Demo mode when endpoint is empty. |
 | ✓ | **Glassmorphism card system** | `.glass` utility — backdrop blur, translucent fill, luminous border, soft shadow |
 | ✓ | **Floating hero card** | Sine-wave float animation with subtle 3-axis mouse tilt |
 | ✓ | **Scroll reveal** | `IntersectionObserver` — elements rise as they enter the viewport |
@@ -150,6 +151,46 @@ themeToggle.addEventListener('click', () => {
   html.dataset.theme = next;
   localStorage.setItem('theme', next);
   setTimeout(() => html.classList.remove('theme-transitioning'), 700);
+});
+```
+
+---
+
+## Real Contact Backend — How It Works
+
+A form that sends nothing is a closed door wearing the face of an open one. This feature wires the glass contact card to **Formspree** — a stateless email-relay service — through a single configuration string at the very top of `script.js`. No server, no build step, no environment file. One URL and the form becomes real.
+
+**The one variable.** The very first line of `script.js`, above everything:
+
+```js
+const FORM_ENDPOINT = ''; // ← e.g. 'https://formspree.io/f/xabcdefg'
+```
+
+When empty, the form operates in **demo mode**: it completes the full visual journey — sending, confirmed, reset — but dispatches nothing. When the endpoint is pasted in, the form goes live. Changing one string is the entire deployment.
+
+**Setting it up.** Sign up at [formspree.io](https://formspree.io), create a new form (free tier: 50 submissions/month), and copy the endpoint URL. Paste it into `FORM_ENDPOINT`. That's the full integration. Formspree handles routing, spam filtering, and email delivery. Each `name` attribute on the form's inputs — `name`, `email`, `subject`, `message` — becomes a labeled field in the received email.
+
+**The async journey.** Submission is a `fetch()` POST with `new FormData(form)`, which reads every named field without manual extraction. The `Accept: application/json` header instructs Formspree to return JSON instead of redirecting, preserving the SPA experience. The handler is `async/await`: linear and readable, structured like a sentence with a beginning, a middle, and two possible endings.
+
+**Three moments of the button.**
+
+- **`is-sending`** — the message is in transit. The button dims to 65% opacity and pulses gently: a `@keyframes` animation at 1.5s `ease-in-out`, breathing between 38% and 65% opacity. The form receives `is-submitting` which removes `pointer-events` from all inputs — the form cannot be resubmitted mid-flight.
+- **`is-sent`** — the message arrived. The button shifts to a translucent green: `rgba(52, 211, 153, 0.20)` background, matching border. Below it, a status line rises into view — *"Your message is on its way. I tend to reply within a day or two."* — then the form resets quietly after 5 seconds.
+- **`is-error`** — something stood between the message and its destination. The button turns rose-pale: `rgba(251, 113, 133, 0.16)`. The status line offers a direct email address as an alternative route. After 6 seconds, the button resets so the user may try again.
+
+**The status line.** A single `<div>` below the submit button, invisible by default (`opacity: 0; transform: translateY(-5px)`). On state change, two CSS transitions play simultaneously: opacity rises and the element lifts 5px — the same upward-drift grammar as the scroll reveal. It carries `role="status"` and `aria-live="polite"` so screen readers announce the outcome without interrupting the user mid-action. On reset, the class is removed first (fade begins), then the text is cleared 450ms later after the transition completes.
+
+**In light mode**, the status colours deepen: the same semantic green and rose, but saturated enough to read against warm parchment (`rgba(10, 130, 70, 0.90)` and `rgba(200, 45, 60, 0.90)`). Both are set as CSS custom properties in `[data-theme="light"]`.
+
+```js
+// One variable. Everything else is handled.
+const FORM_ENDPOINT = 'https://formspree.io/f/xabcdefg';
+
+// The full journey — transit, arrival or failure — in one try/catch
+const res = await fetch(FORM_ENDPOINT, {
+  method:  'POST',
+  body:     new FormData(form),   // reads all named fields
+  headers: { 'Accept': 'application/json' },
 });
 ```
 
@@ -298,6 +339,9 @@ The light-mode accent lives in `[data-theme="light"]` and follows the same patte
 | **Hero reveal — text** | Page load | 900ms | `power2.out`, delay 220ms |
 | **Hero reveal — card** | Page load | 900ms | `power2.out`, delay 400ms |
 | **Section child stagger** | Scroll (section top at 84vh) | 850ms per element | `power3.out`, 80ms between children |
+| **Sending pulse** | Form submit | 1500ms cycle, infinite | `ease-in-out`, 38%–65% opacity |
+| **Status line rise** | Send / error | 420ms | `ease` — opacity + translateY(-5px → 0) |
+| **Status line fade** | Reset | 420ms | `ease` reverse — text cleared after |
 | **Modal backdrop fade** | Card click | 440ms | `ease` |
 | **Modal backdrop blur** | Card click | 440ms | `ease` — `blur(0)` → `blur(20px)` |
 | **Modal panel rise** | Card click | 460ms | Spring `cubic-bezier(0.34,1.26,0.64,1)` |
@@ -346,7 +390,7 @@ Ordered by emotional impact on the viewer.
 - [x] **Typed headline** — recursive `setTimeout`, five roles, 2800ms held pause, 2px blinking cursor, reduced-motion safe
 - [x] **Project detail modals** — click a card; the world behind it blurs into a glass overlay
 - [x] **Staggered section transitions** — sections drift in with GSAP timelines, each child delayed by 80ms
-- [ ] **Real contact backend** — wire the form to Formspree or EmailJS; one environment variable
+- [x] **Real contact backend** — wire the form to Formspree or EmailJS; one environment variable
 - [ ] **Ambient particle field** — a slow, sparse `<canvas>` constellation behind the orbs
 - [ ] **Blog / writing section** — thoughts rendered from Markdown; the voice behind the work
 - [ ] **PWA support** — `manifest.json` and a service worker for offline reading

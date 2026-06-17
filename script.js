@@ -1,3 +1,12 @@
+/* ─────────────────────────────────────────────────────────────────
+   CONTACT FORM — ONE CONFIGURATION LINE
+   Sign up at formspree.io, create a new form, copy the endpoint URL.
+   Paste it into FORM_ENDPOINT below. Everything else is handled:
+   loading state, success confirmation, error with fallback email,
+   auto-reset. Leave empty to run in demo mode — no mail is sent.
+   ───────────────────────────────────────────────────────────────── */
+const FORM_ENDPOINT = ''; // ← e.g. 'https://formspree.io/f/xabcdefg'
+
 // ─── Theme toggle ──────────────────────────────────────────────
 const html = document.documentElement;
 const themeToggle = document.getElementById('themeToggle');
@@ -412,21 +421,91 @@ document.querySelectorAll('.glass').forEach((card) => {
 });
 
 // ─── Contact form ───────────────────────────────────────────────
-const form = document.querySelector('.contact-form');
-if (form) {
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const btn = form.querySelector('.btn-submit');
-    btn.textContent = 'Message sent ✓';
-    btn.style.background = 'linear-gradient(135deg, rgba(52, 211, 153, 0.3), rgba(16, 185, 129, 0.3))';
-    btn.style.borderColor = 'rgba(52, 211, 153, 0.5)';
+// The message leaves the page. The world waits. Then: confirmation,
+// or silence. Each outcome has its own colour and its own patience.
+(function () {
+  const form     = document.querySelector('.contact-form');
+  const statusEl = document.getElementById('formStatus');
+  if (!form || !statusEl) return;
+
+  function showStatus(type, html) {
+    statusEl.innerHTML = html;
+    statusEl.className = `form-status status-${type} is-visible`;
+  }
+
+  function hideStatus() {
+    statusEl.classList.remove('is-visible');
+    // Wait for the fade-out before clearing text
+    setTimeout(() => { statusEl.innerHTML = ''; statusEl.className = 'form-status'; }, 450);
+  }
+
+  function lockForm(btn) {
     btn.disabled = true;
-    setTimeout(() => {
-      btn.textContent = 'Send message';
-      btn.style.background = '';
-      btn.style.borderColor = '';
-      btn.disabled = false;
-      form.reset();
-    }, 3500);
+    form.classList.add('is-submitting');
+  }
+
+  function unlockForm(btn, label, stateClass) {
+    btn.textContent = label;
+    btn.classList.remove('is-sending');
+    btn.classList.add(stateClass);
+    btn.disabled = true; // stays disabled until auto-reset
+    form.classList.remove('is-submitting');
+  }
+
+  function reset(btn, stateClass) {
+    btn.textContent = 'Send message';
+    btn.classList.remove(stateClass);
+    btn.disabled = false;
+    hideStatus();
+    form.reset();
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const btn = form.querySelector('.btn-submit');
+    hideStatus();
+
+    // ── Demo mode — endpoint not yet configured ──────────────────
+    if (!FORM_ENDPOINT) {
+      lockForm(btn);
+      unlockForm(btn, 'Message sent ✓', 'is-sent');
+      showStatus('success', 'Running in demo mode— no message was sent. Add a Formspree endpoint to go live.');
+      setTimeout(() => reset(btn, 'is-sent'), 3800);
+      return;
+    }
+
+    // ── Sending state — the message is in transit ────────────────
+    btn.textContent = 'Sending…';
+    btn.classList.add('is-sending');
+    lockForm(btn);
+
+    try {
+      const res = await fetch(FORM_ENDPOINT, {
+        method:  'POST',
+        body:     new FormData(form),
+        headers: { 'Accept': 'application/json' },
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `HTTP ${res.status}`);
+      }
+
+      // ── Success — the message arrived ──────────────────────────
+      unlockForm(btn, 'Message received ✓', 'is-sent');
+      showStatus('success', 'Your message is on its way. I tend to reply within a day or two.');
+      setTimeout(() => reset(btn, 'is-sent'), 5000);
+
+    } catch (_err) {
+      // ── Error — something stood between the message and its end ─
+      unlockForm(btn, 'Something went wrong', 'is-error');
+      showStatus(
+        'error',
+        'The message didn’t go through. Write directly to ' +
+        '<a href="mailto:hello@cristiansifuentes.dev">hello@cristiansifuentes.dev</a>'
+      );
+      setTimeout(() => reset(btn, 'is-error'), 6000);
+    }
   });
-}
+}());

@@ -73,6 +73,10 @@
   --modal-backdrop-bg: rgba(4, 4, 14, 0.64);
   --modal-glass-bg:    rgba(13, 16, 30, 0.84);
 
+  /* Form status feedback */
+  --form-status-success: rgba(52, 211, 153, 0.90);
+  --form-status-error:   rgba(251, 113, 133, 0.90);
+
   /* Geometry */
   --radius-lg: 24px;
   --radius-md: 16px;
@@ -141,6 +145,10 @@
   /* Modal */
   --modal-backdrop-bg: rgba(52, 38, 18, 0.40);
   --modal-glass-bg:    rgba(248, 244, 238, 0.92);
+
+  /* Form status feedback — deeper for warm-parchment readability */
+  --form-status-success: rgba(10, 130, 70, 0.90);
+  --form-status-error:   rgba(200, 45, 60, 0.90);
 }
 
 /* ─── Theme-switch crossfade ─────────────────────────────────────
@@ -1206,6 +1214,79 @@ nav.scrolled {
   transform: translateY(-2px);
   box-shadow: 0 8px 28px var(--accent-glow);
 }
+
+/* ─── Contact form states ────────────────────────────────────────
+   Three moments in the life of a message:
+   the quiet transit, the green of arrival, the rose of return.
+   Each earns its own colour, its own patience.
+   ────────────────────────────────────────────────────────────── */
+
+/* The message is in transit — a held breath, a slow pulse */
+.btn-submit.is-sending {
+  opacity: 0.65;
+  cursor: default;
+  animation: sending-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes sending-pulse {
+  0%, 100% { opacity: 0.65; }
+  50%       { opacity: 0.38; }
+}
+
+/* Arrival confirmed — the colour of something received */
+.btn-submit.is-sent {
+  background:   linear-gradient(135deg, rgba(52, 211, 153, 0.20), rgba(16, 185, 129, 0.20));
+  border-color: rgba(52, 211, 153, 0.46);
+  color:        rgba(52, 211, 153, 0.92);
+  filter:       none;
+  transform:    none;
+}
+
+/* Something stood between the message and its destination */
+.btn-submit.is-error {
+  background:   linear-gradient(135deg, rgba(251, 113, 133, 0.16), rgba(239, 68, 68, 0.16));
+  border-color: rgba(251, 113, 133, 0.40);
+  color:        rgba(251, 113, 133, 0.92);
+  filter:       none;
+  transform:    none;
+}
+
+/* Inputs softly withdrawn while the submission is in flight */
+.contact-form.is-submitting input,
+.contact-form.is-submitting textarea {
+  opacity: 0.50;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Status line — rises from below the button to deliver its news */
+.form-status {
+  font-size: 0.86rem;
+  line-height: 1.68;
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: opacity 0.42s ease, transform 0.42s ease;
+  margin-top: 14px;
+}
+
+.form-status.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.form-status.status-success { color: var(--form-status-success); }
+.form-status.status-error   { color: var(--form-status-error); }
+
+/* The fallback email link inside the error message */
+.form-status a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  opacity: 0.85;
+  transition: opacity var(--transition);
+}
+
+.form-status a:hover { opacity: 1; }
 
 /* ─── Footer ───────────────────────────────────────────────────── */
 footer {
