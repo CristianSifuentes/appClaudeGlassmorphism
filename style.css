@@ -69,6 +69,14 @@
   --cursor-glow-core: rgba(124, 156, 255, 0.50);
   --cursor-glow-edge: rgba(124, 156, 255, 0);
 
+  /* Modal */
+  --modal-backdrop-bg: rgba(4, 4, 14, 0.64);
+  --modal-glass-bg:    rgba(13, 16, 30, 0.84);
+
+  /* Form status feedback */
+  --form-status-success: rgba(52, 211, 153, 0.90);
+  --form-status-error:   rgba(251, 113, 133, 0.90);
+
   /* Geometry */
   --radius-lg: 24px;
   --radius-md: 16px;
@@ -133,6 +141,14 @@
   --cursor-color:     #3d5a7e;
   --cursor-glow-core: rgba(61, 90, 126, 0.35);
   --cursor-glow-edge: rgba(61, 90, 126, 0);
+
+  /* Modal */
+  --modal-backdrop-bg: rgba(52, 38, 18, 0.40);
+  --modal-glass-bg:    rgba(248, 244, 238, 0.92);
+
+  /* Form status feedback — deeper for warm-parchment readability */
+  --form-status-success: rgba(10, 130, 70, 0.90);
+  --form-status-error:   rgba(200, 45, 60, 0.90);
 }
 
 /* ─── Theme-switch crossfade ─────────────────────────────────────
@@ -391,7 +407,8 @@ nav.scrolled {
 /* Suppress native cursor only on true pointer devices */
 @media (hover: hover) and (pointer: fine) {
   html,
-  a, button, label, input, textarea, select { cursor: none !important; }
+  a, button, label, input, textarea, select,
+  [role="button"] { cursor: none !important; }
 }
 
 .cursor-dot,
@@ -515,6 +532,198 @@ nav.scrolled {
 @keyframes typed-blink {
   0%, 44%   { opacity: 1; }
   56%, 100% { opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PROJECT MODALS
+   The card is clicked. The world does not vanish — it softens,
+   recedes into impressionism, held at a respectful distance.
+   The glass panel rises through the haze like a page turning
+   slowly in a hand that already knows what it will find.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Backdrop — the world held at a blurred distance ── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: var(--modal-backdrop-bg);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity              0.44s ease,
+    backdrop-filter      0.44s ease,
+    -webkit-backdrop-filter 0.44s ease;
+}
+
+.modal-backdrop.is-open {
+  opacity: 1;
+  pointer-events: all;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ── Glass panel — rising through the softened world ── */
+.modal-glass {
+  position: relative;
+  background: var(--modal-glass-bg);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  box-shadow:
+    0 40px 80px rgba(0, 0, 0, 0.52),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  max-width: 680px;
+  width: 100%;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: scale(0.94) translateY(28px);
+  opacity: 0;
+  transition:
+    transform        0.46s cubic-bezier(0.34, 1.26, 0.64, 1),
+    opacity          0.38s ease,
+    border-color     0.45s ease,
+    background-color 0.45s ease,
+    box-shadow       0.45s ease;
+}
+
+.modal-backdrop.is-open .modal-glass {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* ── Close button — absolute, always visible ── */
+.modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  flex-shrink: 0;
+  transition:
+    background-color var(--transition),
+    border-color     var(--transition);
+}
+
+.modal-close:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+}
+
+.modal-close svg {
+  width: 14px;
+  height: 14px;
+  color: var(--text-secondary);
+  pointer-events: none;
+  transition: color var(--transition);
+}
+
+.modal-close:hover svg {
+  color: var(--text-primary);
+}
+
+/* ── Scrollable content area ── */
+.modal-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--glass-border) transparent;
+}
+
+.modal-scroll::-webkit-scrollbar       { width: 4px; }
+.modal-scroll::-webkit-scrollbar-track { background: transparent; }
+.modal-scroll::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 2px;
+}
+
+/* ── Inner body — the content arranged like a letter ── */
+.modal-body {
+  padding: 64px 48px 48px;
+}
+
+/* The large emoji sits like an illuminated initial */
+.modal-hero {
+  width: 100%;
+  height: 185px;
+  border-radius: var(--radius-md);
+  background: var(--gradient-project-img);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.6rem;
+  margin-bottom: 32px;
+  transition: border-color 0.45s ease;
+}
+
+.modal-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.modal-title {
+  font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin-bottom: 14px;
+  color: var(--text-primary);
+  transition: color 0.45s ease;
+}
+
+.modal-desc {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.78;
+  transition: color 0.45s ease;
+}
+
+/* The deeper story — quieter, more meditative, set apart */
+.modal-detail {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.82;
+  font-style: italic;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--glass-border);
+  margin-bottom: 34px;
+  transition: color 0.45s ease, border-color 0.45s ease;
+}
+
+.modal-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .modal-body { padding: 60px 28px 36px; }
+  .modal-hero { height: 130px; font-size: 2.6rem; }
 }
 
 /* ─── Hero ─────────────────────────────────────────────────────── */
@@ -1006,6 +1215,290 @@ nav.scrolled {
   box-shadow: 0 8px 28px var(--accent-glow);
 }
 
+/* ─── Contact form states ────────────────────────────────────────
+   Three moments in the life of a message:
+   the quiet transit, the green of arrival, the rose of return.
+   Each earns its own colour, its own patience.
+   ────────────────────────────────────────────────────────────── */
+
+/* The message is in transit — a held breath, a slow pulse */
+.btn-submit.is-sending {
+  opacity: 0.65;
+  cursor: default;
+  animation: sending-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes sending-pulse {
+  0%, 100% { opacity: 0.65; }
+  50%       { opacity: 0.38; }
+}
+
+/* Arrival confirmed — the colour of something received */
+.btn-submit.is-sent {
+  background:   linear-gradient(135deg, rgba(52, 211, 153, 0.20), rgba(16, 185, 129, 0.20));
+  border-color: rgba(52, 211, 153, 0.46);
+  color:        rgba(52, 211, 153, 0.92);
+  filter:       none;
+  transform:    none;
+}
+
+/* Something stood between the message and its destination */
+.btn-submit.is-error {
+  background:   linear-gradient(135deg, rgba(251, 113, 133, 0.16), rgba(239, 68, 68, 0.16));
+  border-color: rgba(251, 113, 133, 0.40);
+  color:        rgba(251, 113, 133, 0.92);
+  filter:       none;
+  transform:    none;
+}
+
+/* Inputs softly withdrawn while the submission is in flight */
+.contact-form.is-submitting input,
+.contact-form.is-submitting textarea {
+  opacity: 0.50;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Status line — rises from below the button to deliver its news */
+.form-status {
+  font-size: 0.86rem;
+  line-height: 1.68;
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: opacity 0.42s ease, transform 0.42s ease;
+  margin-top: 14px;
+}
+
+.form-status.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.form-status.status-success { color: var(--form-status-success); }
+.form-status.status-error   { color: var(--form-status-error); }
+
+/* The fallback email link inside the error message */
+.form-status a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  opacity: 0.85;
+  transition: opacity var(--transition);
+}
+
+.form-status a:hover { opacity: 1; }
+
+/* ═══════════════════════════════════════════════════════════════
+   WRITING / BLOG
+   The voice behind the work. Each card is a sealed letter —
+   the first line visible, the rest held behind the glass
+   until the reader chooses to open it.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Post grid ── */
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+/* ── Post card ── */
+.post-card {
+  display: flex;
+  flex-direction: column;
+  padding: 34px;
+  cursor: pointer;
+}
+
+.post-card-date {
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  transition: color 0.45s ease;
+}
+
+.post-card-title {
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  transition: color 0.45s ease;
+}
+
+.post-card-excerpt {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.72;
+  flex: 1;
+  margin-bottom: 22px;
+  transition: color 0.45s ease;
+}
+
+/* The quiet call to read — not a button, more a gesture */
+.post-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.80rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  transition: gap var(--transition), color var(--transition);
+}
+
+.post-card:hover .post-card-cta,
+.post-card:focus-visible .post-card-cta {
+  gap: 10px;
+}
+
+/* ── Post reader — the glass panel sized for comfortable reading ── */
+.post-glass {
+  max-width: 720px;
+}
+
+/* ── Inner reading layout ── */
+.post-reader {
+  padding: 64px 56px 56px;
+}
+
+.post-reader-header {
+  margin-bottom: 36px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--glass-border);
+  transition: border-color 0.45s ease;
+}
+
+.post-reader-meta {
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  transition: color 0.45s ease;
+}
+
+.post-reader-title {
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--text-primary);
+  transition: color 0.45s ease;
+}
+
+/* ── Markdown body — the rendered text, typeset with care ────────
+   Each element earns its spacing. Nothing added without reason.
+   ────────────────────────────────────────────────────────────── */
+.post-body {
+  font-size: 0.97rem;
+  color: var(--text-secondary);
+  line-height: 1.85;
+  transition: color 0.45s ease;
+}
+
+.post-body p {
+  margin-bottom: 1.5em;
+}
+
+.post-body p:last-child { margin-bottom: 0; }
+
+.post-body h1, .post-body h2, .post-body h3 {
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  margin: 2em 0 0.75em;
+  transition: color 0.45s ease;
+}
+
+.post-body h2 { font-size: 1.28rem; font-weight: 700; }
+.post-body h3 { font-size: 1.08rem; font-weight: 600; }
+
+.post-body em     { font-style: italic; }
+.post-body strong { color: var(--text-primary); font-weight: 700; transition: color 0.45s ease; }
+
+/* The blockquote — a sentence that earned its own room.
+   The thin accent line marks it as something set apart. */
+.post-body blockquote {
+  border-left: 2px solid var(--accent);
+  margin: 1.8em 0;
+  padding: 0.15em 0 0.15em 1.5em;
+  color: var(--text-muted);
+  font-style: italic;
+  transition: border-color 0.45s ease, color 0.45s ease;
+}
+
+.post-body blockquote p { margin-bottom: 0; }
+
+/* Inline code — glass-tinted, accent-coloured */
+.post-body :not(pre) > code {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.87em;
+  font-family: 'SF Mono', 'Fira Code', 'Fira Mono', monospace;
+  color: var(--accent);
+  transition: background-color 0.45s ease, border-color 0.45s ease, color 0.45s ease;
+}
+
+/* Code blocks */
+.post-body pre {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 20px 22px;
+  overflow-x: auto;
+  margin: 1.6em 0;
+  transition: background-color 0.45s ease, border-color 0.45s ease;
+}
+
+.post-body pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+/* The horizontal rule — a breath between thoughts */
+.post-body hr {
+  border: none;
+  border-top: 1px solid var(--glass-border);
+  margin: 2.4em 0;
+  transition: border-color 0.45s ease;
+}
+
+.post-body a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color var(--transition), text-decoration-color var(--transition);
+}
+
+.post-body ul, .post-body ol {
+  padding-left: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.post-body li { margin-bottom: 0.4em; }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .post-reader { padding: 60px 28px 36px; }
+}
+
 /* ─── Footer ───────────────────────────────────────────────────── */
 footer {
   padding: 36px 0;
@@ -1024,16 +1517,35 @@ footer a {
   transition: color 0.45s ease;
 }
 
+/* ─── Particle canvas ───────────────────────────────────────────
+   Behind the orbs. Behind the glass. Barely there.
+   The constellation breathes below everything else,
+   a layer the eye only notices when it stops looking.
+   ────────────────────────────────────────────────────────────── */
+#particleCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.8s ease;
+}
+
+#particleCanvas.is-ready {
+  opacity: 1;
+}
+
 /* ─── Scroll reveal ────────────────────────────────────────────── */
+/* Initial hidden state. GSAP owns the animation — no CSS transition
+   needed here. If GSAP fails, the JS fallback reveals all elements
+   inline. Reduced-motion users see content immediately via CSS. */
 .reveal {
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
 }
 
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; }
 }
 
 /* ─── Responsive ───────────────────────────────────────────────── */

@@ -1,3 +1,12 @@
+/* ─────────────────────────────────────────────────────────────────
+   CONTACT FORM — ONE CONFIGURATION LINE
+   Sign up at formspree.io, create a new form, copy the endpoint URL.
+   Paste it into FORM_ENDPOINT below. Everything else is handled:
+   loading state, success confirmation, error with fallback email,
+   auto-reset. Leave empty to run in demo mode — no mail is sent.
+   ───────────────────────────────────────────────────────────────── */
+const FORM_ENDPOINT = ''; // ← e.g. 'https://formspree.io/f/xabcdefg'
+
 // ─── Theme toggle ──────────────────────────────────────────────
 const html = document.documentElement;
 const themeToggle = document.getElementById('themeToggle');
@@ -53,7 +62,7 @@ themeToggle.addEventListener('click', () => {
   });
 
   // ── Interactive elements change cursor behaviour ─────────────────
-  document.querySelectorAll('a, button, label, input, textarea').forEach((el) => {
+  document.querySelectorAll('a, button, label, input, textarea, [role="button"]').forEach((el) => {
     el.addEventListener('mouseenter', () => {
       dot.classList.add('is-interactive');
       glow.classList.add('is-interactive');
@@ -206,26 +215,456 @@ themeToggle.addEventListener('click', () => {
   setTimeout(tick, 1200);
 }());
 
+// ─── Project detail modals ──────────────────────────────────────
+// Click a card and the world behind it softens, recedes.
+// The glass panel rises through the blurred haze — the rest of
+// the page held at a respectful, impressionistic distance.
+(function () {
+  const backdrop   = document.getElementById('modalBackdrop');
+  const closeBtn   = document.getElementById('modalClose');
+  const modalHero  = document.getElementById('modalHero');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalDesc  = document.getElementById('modalDesc');
+  const modalDetail = document.getElementById('modalDetail');
+  const modalTagRow = document.getElementById('modalTagRow');
+  const modalCta   = document.getElementById('modalCta');
+
+  if (!backdrop) return;
+
+  let lastFocused = null;
+
+  function open(card) {
+    // Read content from the card's existing DOM — no duplication
+    const emoji  = card.querySelector('.project-image').textContent.trim();
+    const title  = card.querySelector('h3').textContent.trim();
+    const desc   = card.querySelector('p').textContent.trim();
+    const detail = card.dataset.detail || '';
+    const tags   = Array.from(card.querySelectorAll('.tag')).map((t) => t.textContent.trim());
+    const href   = card.querySelector('.project-link')?.getAttribute('href') || '#';
+
+    // Populate the glass panel
+    modalHero.textContent  = emoji;
+    modalTitle.textContent = title;
+    modalDesc.textContent  = desc;
+    modalDetail.textContent = detail;
+    modalDetail.style.display = detail ? '' : 'none';
+
+    modalTagRow.innerHTML = '';
+    tags.forEach((tag) => {
+      const span = document.createElement('span');
+      span.className = 'tag';
+      span.textContent = tag;
+      modalTagRow.appendChild(span);
+    });
+
+    modalCta.href = href;
+
+    // Prevent scrollbar-shift jank
+    const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.paddingRight = scrollbarW + 'px';
+    document.body.style.overflow     = 'hidden';
+
+    // Open — the world blurs in
+    lastFocused = document.activeElement;
+    backdrop.removeAttribute('aria-hidden');
+    backdrop.classList.add('is-open');
+
+    setTimeout(() => closeBtn.focus(), 50);
+  }
+
+  function close() {
+    backdrop.classList.remove('is-open');
+    document.body.style.overflow     = '';
+    document.body.style.paddingRight = '';
+    if (lastFocused) lastFocused.focus();
+
+    // Restore aria-hidden only after the fade-out completes
+    backdrop.addEventListener(
+      'transitionend',
+      () => backdrop.setAttribute('aria-hidden', 'true'),
+      { once: true }
+    );
+  }
+
+  // Wire every project card — click or Enter/Space to open
+  document.querySelectorAll('.project-card').forEach((card) => {
+    card.addEventListener('click', () => open(card));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        open(card);
+      }
+    });
+  });
+
+  closeBtn.addEventListener('click', close);
+
+  // Click the dark backdrop area (outside the panel) to close
+  backdrop.addEventListener('click', (e) => {
+    if (e.target === backdrop) close();
+  });
+
+  // Escape to close — the world reassembles gently behind you
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && backdrop.classList.contains('is-open')) close();
+  });
+}());
+
 // ─── Nav scroll effect ─────────────────────────────────────────
 const nav = document.querySelector('nav');
 window.addEventListener('scroll', () => {
   nav.classList.toggle('scrolled', window.scrollY > 40);
 });
 
-// ─── Scroll reveal ─────────────────────────────────────────────
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        revealObserver.unobserve(entry.target);
-      }
+// ─── Staggered section transitions ──────────────────────────────
+// Sections do not arrive. They assemble — each child drifting into
+// place in turn, like objects being set down with deliberate care.
+// The 80ms gap between each element is the space between thoughts:
+// long enough to feel, short enough that the whole still coheres.
+(function () {
+  // If GSAP didn't load from CDN, reveal everything immediately
+  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+    document.querySelectorAll('.reveal').forEach((el) => {
+      el.style.opacity = '1';
+      el.style.transform = 'none';
     });
-  },
-  { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
-);
+    return;
+  }
 
-document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+  // Reduced motion: show all at once without animation
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    gsap.set('.reveal', { opacity: 1, y: 0, clearProps: 'all' });
+    return;
+  }
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // ── Hero — above the fold, animates on page load ─────────────────
+  // The text is ready when the typewriter begins. The card settles
+  // just after, carrying the weight of the introduction.
+  const heroItems = Array.from(document.querySelectorAll('#hero .reveal'));
+  if (heroItems.length) {
+    gsap.set(heroItems, { opacity: 0, y: 24 });
+    gsap.to(heroItems, {
+      opacity:    1,
+      y:          0,
+      duration:   0.90,
+      ease:       'power2.out',
+      stagger:    0.18,
+      delay:      0.22,
+      clearProps: 'transform',
+    });
+  }
+
+  // ── All sections below the fold — drift in on scroll ─────────────
+  // Each section assembles its children one by one. Not all at once —
+  // that would be noise. One. Then the next. Then the next. A cadence.
+  document.querySelectorAll('section:not(#hero)').forEach((section) => {
+    const items = Array.from(section.querySelectorAll('.reveal'));
+    if (!items.length) return;
+
+    gsap.set(items, { opacity: 0, y: 28 });
+
+    ScrollTrigger.create({
+      trigger: section,
+      start:   'top 84%',
+      once:    true,
+      onEnter() {
+        gsap.to(items, {
+          opacity:    1,
+          y:          0,
+          duration:   0.85,                  // the time of one slow breath
+          ease:       'power3.out',          // settles into place, not bounces
+          stagger:    0.08,                  // 80ms — the specified cadence
+          clearProps: 'transform',           // release to card-tilt after reveal
+        });
+      },
+    });
+  });
+}());
+
+// ─── Ambient particle field ─────────────────────────────────────
+// Stars do not hurry. They drift at a speed the eye cannot quite
+// follow, trailing faint lines between near-neighbours — connections
+// that form and dissolve like thoughts not quite held. Behind the
+// orbs. Behind the glass. The thing you see when you stop looking.
+(function () {
+  const canvas = document.getElementById('particleCanvas');
+  if (!canvas) return;
+
+  // Motion-sensitive users see nothing — the stillness is its own answer
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    canvas.style.display = 'none';
+    return;
+  }
+
+  const ctx   = canvas.getContext('2d');
+  const htmlEl = document.documentElement;
+
+  // ── Constants ─────────────────────────────────────────────────────
+  const COUNT    = 55;    // sparse — the negative space carries the weight
+  const MAX_SPD  = 0.28;  // px/frame — slower than a minute hand
+  const JITTER   = 0.008; // random-walk delta — keeps drift organic
+  const LINK_R   = 140;   // px — constellation connection threshold
+  const LINE_OPA = 0.13;  // max line opacity — a whisper, not a voice
+
+  // ── Per-theme accent colours ──────────────────────────────────────
+  // Dark: #7c9cff cold periwinkle   Light: #5d7a9e dusty slate
+  const DARK_COL  = { r: 124, g: 156, b: 255 };
+  const LIGHT_COL = { r:  93, g: 122, b: 158 };
+
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  // Colour lerps from current toward target on every frame —
+  // theme transitions play out over ~2s after the CSS switch.
+  let col    = Object.assign({}, htmlEl.dataset.theme === 'light' ? LIGHT_COL : DARK_COL);
+  let target = Object.assign({}, col);
+
+  // ── Canvas sizing — DPR-aware ──────────────────────────────────────
+  let W, H, dpr;
+
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    W   = window.innerWidth;
+    H   = window.innerHeight;
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // reset + apply DPR — no accumulated drift
+  }
+
+  // ── Spawn one particle at (x, y) ──────────────────────────────────
+  function make(x, y) {
+    const angle = Math.random() * Math.PI * 2;
+    const spd   = 0.05 + Math.random() * MAX_SPD;
+    return {
+      x, y,
+      vx:    Math.cos(angle) * spd,
+      vy:    Math.sin(angle) * spd,
+      r:     0.7  + Math.random() * 1.7,    // 0.7 – 2.4 px  — motes to small lights
+      alpha: 0.22 + Math.random() * 0.44,   // 0.22 – 0.66  — none fully visible
+      phase: Math.random() * Math.PI * 2,   // breath phase — unique per particle
+      bpm:   0.005 + Math.random() * 0.009, // breathing speed — no two pulse alike
+      px:    0,                              // pulsed alpha, computed each frame
+    };
+  }
+
+  // ── Initialise ────────────────────────────────────────────────────
+  let particles;
+
+  function init() {
+    resize();
+    particles = Array.from({ length: COUNT }, () =>
+      make(Math.random() * W, Math.random() * H)
+    );
+    // Emerge slowly — no sudden arrival, no announcement
+    setTimeout(() => canvas.classList.add('is-ready'), 200);
+  }
+
+  // ── Animation loop ────────────────────────────────────────────────
+  function tick() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Colour lerp toward theme target — smooth, unhurried shift
+    col.r = lerp(col.r, target.r, 0.03);
+    col.g = lerp(col.g, target.g, 0.03);
+    col.b = lerp(col.b, target.b, 0.03);
+    const cr = col.r | 0;
+    const cg = col.g | 0;
+    const cb = col.b | 0;
+
+    // ── Update — positions, random walk, wrapping, breath ───────────
+    particles.forEach((p) => {
+      p.vx += (Math.random() - 0.5) * JITTER;
+      p.vy += (Math.random() - 0.5) * JITTER;
+      const s = Math.hypot(p.vx, p.vy);
+      if (s > MAX_SPD) { p.vx = p.vx / s * MAX_SPD; p.vy = p.vy / s * MAX_SPD; }
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Seamless edge wrap — particles reappear on the opposite side
+      if (p.x < -24) p.x = W + 24;
+      if (p.x > W + 24) p.x = -24;
+      if (p.y < -24) p.y = H + 24;
+      if (p.y > H + 24) p.y = -24;
+
+      // Breathed opacity — stored so line drawing can share the value
+      p.px = p.alpha * (0.50 + 0.50 * Math.sin(p.phase));
+      p.phase += p.bpm;
+    });
+
+    // ── Constellation lines — behind particles, first in paint order ─
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx   = particles[j].x - particles[i].x;
+        const dy   = particles[j].y - particles[i].y;
+        const dist = Math.hypot(dx, dy);
+        if (dist >= LINK_R) continue;
+
+        const a = (1 - dist / LINK_R) * LINE_OPA;
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(${cr},${cg},${cb},${a.toFixed(3)})`;
+        ctx.lineWidth   = 0.5;
+        ctx.stroke();
+      }
+    }
+
+    // ── Particles — on top of lines, breathing independently ────────
+    particles.forEach((p) => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${cr},${cg},${cb},${p.px.toFixed(3)})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(tick);
+  }
+
+  // ── Wire up ───────────────────────────────────────────────────────
+  init();
+  tick();
+
+  window.addEventListener('resize', resize);
+
+  // When the theme toggles, point the colour lerp at its new target.
+  // The canvas drifts into its new palette over ~2 seconds — longer
+  // than the CSS transition, so the stars are the last thing to change.
+  const toggleBtn = document.getElementById('themeToggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      requestAnimationFrame(() => {
+        target = Object.assign({}, htmlEl.dataset.theme === 'light' ? LIGHT_COL : DARK_COL);
+      });
+    });
+  }
+}());
+
+// ─── Writing / Blog section ─────────────────────────────────────
+// Three glass cards, each a sealed letter. The first sentence is
+// visible. The rest waits behind the glass, patient. Click: the
+// world softens, the post opens. Read. Close. The world returns.
+(function () {
+  const grid      = document.getElementById('postsGrid');
+  const backdrop  = document.getElementById('postBackdrop');
+  const closeBtn  = document.getElementById('postClose');
+  const postMeta  = document.getElementById('postMeta');
+  const postTitle = document.getElementById('postTitle');
+  const postBody  = document.getElementById('postBody');
+
+  if (!grid || !backdrop || typeof POSTS === 'undefined') return;
+
+  // ── Render post cards from the POSTS data array ──────────────────
+  POSTS.forEach((post) => {
+    const dateStr = new Date(post.date).toLocaleDateString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric',
+    });
+
+    const card = document.createElement('div');
+    card.className = 'glass post-card reveal';
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-haspopup', 'dialog');
+    card.innerHTML = `
+      <div class="post-card-date">${dateStr} &middot; ${post.readTime}</div>
+      <h3 class="post-card-title">${post.title}</h3>
+      <p class="post-card-excerpt">${post.excerpt}</p>
+      <span class="post-card-cta" aria-hidden="true">Read &rarr;</span>
+    `;
+
+    card.addEventListener('click', () => open(post));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(post); }
+    });
+
+    grid.appendChild(card);
+  });
+
+  // Register rendered cards with GSAP scroll reveal (they come in
+  // after the main stagger IIFE has already run, so get their own trigger)
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    const cards = Array.from(grid.querySelectorAll('.post-card'));
+    gsap.set(cards, { opacity: 0, y: 28 });
+    ScrollTrigger.create({
+      trigger: '#writing',
+      start:   'top 84%',
+      once:    true,
+      onEnter() {
+        gsap.to(cards, {
+          opacity:    1,
+          y:          0,
+          duration:   0.85,
+          ease:       'power3.out',
+          stagger:    0.08,
+          delay:      0.08, // let the section header lead by one step
+          clearProps: 'transform',
+        });
+      },
+    });
+  } else {
+    // GSAP unavailable — show cards immediately
+    grid.querySelectorAll('.post-card').forEach((c) => {
+      c.style.opacity   = '1';
+      c.style.transform = 'none';
+    });
+  }
+
+  // ── Post reader — open ───────────────────────────────────────────
+  let lastFocused = null;
+
+  function open(post) {
+    const dateStr = new Date(post.date).toLocaleDateString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric',
+    });
+
+    postMeta.textContent  = `${dateStr} · ${post.readTime} read`;
+    postTitle.textContent = post.title;
+
+    // Render Markdown — marked.js produces clean, semantic HTML
+    if (typeof marked !== 'undefined') {
+      postBody.innerHTML = marked.parse(post.content.trim());
+    } else {
+      // Fallback: plain paragraphs split on double newline
+      postBody.innerHTML = post.content.trim()
+        .split(/\n\n+/)
+        .map((p) => `<p>${p.replace(/\n/g, ' ').trim()}</p>`)
+        .join('');
+    }
+
+    const sw = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.paddingRight = sw + 'px';
+    document.body.style.overflow     = 'hidden';
+
+    lastFocused = document.activeElement;
+    backdrop.removeAttribute('aria-hidden');
+    backdrop.classList.add('is-open');
+    // Scroll the reader back to top for each new post
+    backdrop.querySelector('.modal-scroll').scrollTop = 0;
+    setTimeout(() => closeBtn.focus(), 50);
+  }
+
+  // ── Post reader — close ──────────────────────────────────────────
+  function close() {
+    backdrop.classList.remove('is-open');
+    document.body.style.overflow     = '';
+    document.body.style.paddingRight = '';
+    if (lastFocused) lastFocused.focus();
+    backdrop.addEventListener(
+      'transitionend',
+      () => backdrop.setAttribute('aria-hidden', 'true'),
+      { once: true }
+    );
+  }
+
+  closeBtn.addEventListener('click', close);
+  backdrop.addEventListener('click', (e) => { if (e.target === backdrop) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && backdrop.classList.contains('is-open')) close();
+  });
+}());
 
 // ─── Skill bars ─────────────────────────────────────────────────
 const skillObserver = new IntersectionObserver(
@@ -265,21 +704,91 @@ document.querySelectorAll('.glass').forEach((card) => {
 });
 
 // ─── Contact form ───────────────────────────────────────────────
-const form = document.querySelector('.contact-form');
-if (form) {
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const btn = form.querySelector('.btn-submit');
-    btn.textContent = 'Message sent ✓';
-    btn.style.background = 'linear-gradient(135deg, rgba(52, 211, 153, 0.3), rgba(16, 185, 129, 0.3))';
-    btn.style.borderColor = 'rgba(52, 211, 153, 0.5)';
+// The message leaves the page. The world waits. Then: confirmation,
+// or silence. Each outcome has its own colour and its own patience.
+(function () {
+  const form     = document.querySelector('.contact-form');
+  const statusEl = document.getElementById('formStatus');
+  if (!form || !statusEl) return;
+
+  function showStatus(type, html) {
+    statusEl.innerHTML = html;
+    statusEl.className = `form-status status-${type} is-visible`;
+  }
+
+  function hideStatus() {
+    statusEl.classList.remove('is-visible');
+    // Wait for the fade-out before clearing text
+    setTimeout(() => { statusEl.innerHTML = ''; statusEl.className = 'form-status'; }, 450);
+  }
+
+  function lockForm(btn) {
     btn.disabled = true;
-    setTimeout(() => {
-      btn.textContent = 'Send message';
-      btn.style.background = '';
-      btn.style.borderColor = '';
-      btn.disabled = false;
-      form.reset();
-    }, 3500);
+    form.classList.add('is-submitting');
+  }
+
+  function unlockForm(btn, label, stateClass) {
+    btn.textContent = label;
+    btn.classList.remove('is-sending');
+    btn.classList.add(stateClass);
+    btn.disabled = true; // stays disabled until auto-reset
+    form.classList.remove('is-submitting');
+  }
+
+  function reset(btn, stateClass) {
+    btn.textContent = 'Send message';
+    btn.classList.remove(stateClass);
+    btn.disabled = false;
+    hideStatus();
+    form.reset();
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const btn = form.querySelector('.btn-submit');
+    hideStatus();
+
+    // ── Demo mode — endpoint not yet configured ──────────────────
+    if (!FORM_ENDPOINT) {
+      lockForm(btn);
+      unlockForm(btn, 'Message sent ✓', 'is-sent');
+      showStatus('success', 'Running in demo mode— no message was sent. Add a Formspree endpoint to go live.');
+      setTimeout(() => reset(btn, 'is-sent'), 3800);
+      return;
+    }
+
+    // ── Sending state — the message is in transit ────────────────
+    btn.textContent = 'Sending…';
+    btn.classList.add('is-sending');
+    lockForm(btn);
+
+    try {
+      const res = await fetch(FORM_ENDPOINT, {
+        method:  'POST',
+        body:     new FormData(form),
+        headers: { 'Accept': 'application/json' },
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `HTTP ${res.status}`);
+      }
+
+      // ── Success — the message arrived ──────────────────────────
+      unlockForm(btn, 'Message received ✓', 'is-sent');
+      showStatus('success', 'Your message is on its way. I tend to reply within a day or two.');
+      setTimeout(() => reset(btn, 'is-sent'), 5000);
+
+    } catch (_err) {
+      // ── Error — something stood between the message and its end ─
+      unlockForm(btn, 'Something went wrong', 'is-error');
+      showStatus(
+        'error',
+        'The message didn’t go through. Write directly to ' +
+        '<a href="mailto:hello@cristiansifuentes.dev">hello@cristiansifuentes.dev</a>'
+      );
+      setTimeout(() => reset(btn, 'is-error'), 6000);
+    }
   });
-}
+}());
