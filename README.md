@@ -68,6 +68,7 @@ In light mode the glass warms: higher opacity, amber tint, sepia shadow. The sam
 | ✓ | **Blog / writing section** | Three glass cards rendered from `posts.js`. Markdown parsed client-side via `marked.js`. Full post opens in a reading modal with literary typography — blockquotes, inline code, `<hr>` dividers, comfortable 1.85 line-height. Separate GSAP stagger for dynamically rendered cards. |
 | ✓ | **PWA support** | `manifest.json` + service worker. Cache-first for local assets, stale-while-revalidate for CDN. Pre-caches the full reading experience on first visit. Offline navigation falls back to `index.html`. Installable to home screen. Theme-aware `theme-color` meta for native status bar. |
 | ✓ | **Multilingual support** | English / Spanish. All UI strings in `lang.js` — one object per language. `data-i18n` attributes on every translatable element. Glass pill toggle in the nav. 160ms opacity-fade crossfade on switch. `localStorage` persistence. Browser language auto-detection on first load. Typewriter roles and form reset text update live. |
+| ✓ | **Image optimisation** | `<picture>` element with WebP `<source>` + JPEG fallback — browser selects format before JS runs. `srcset` at 400w and 800w with `sizes`. `loading="lazy"` + `decoding="async"` on all project thumbnails. 650ms opacity reveal on load. Emoji fallback holds the frame until the photograph arrives; yields silently when it does. No-JS fallback via `<noscript>`. |
 | ✓ | **Glassmorphism card system** | `.glass` utility — backdrop blur, translucent fill, luminous border, soft shadow |
 | ✓ | **Floating hero card** | Sine-wave float animation with subtle 3-axis mouse tilt |
 | ✓ | **Scroll reveal** | `IntersectionObserver` — elements rise as they enter the viewport |
@@ -330,6 +331,65 @@ backdrop.addEventListener('transitionend', () => {
 
 ---
 
+## Image Optimisation — How It Works
+
+The portfolio does not demand attention. Images arrive when the reader does — never earlier, never announced. The emoji holds the frame open, patient, until the photograph takes its place. And when the photograph arrives, it does not snap into existence. It surfaces slowly, over 650 milliseconds — the way a print emerges in developer fluid in a darkroom: first a suggestion, then a shape, then the full image. The emoji fades in parallel, slightly faster, so the transition feels like replacement rather than layering.
+
+**The `<picture>` element.** Each project thumbnail is a `<picture>` containing a `<source type="image/webp">` and an `<img>` fallback. The browser chooses the format before JavaScript runs — before layout, before paint, in the fetch pipeline. If it understands WebP, it fetches the `.webp` file (30–50% smaller than JPEG at equivalent quality); if not, it falls back to the `.jpg`. No detection script. No format negotiation in code. The HTML already knows what to offer and to whom.
+
+**`srcset` and sizes.** Each WebP source carries two variants — `400w` and `800w` — alongside a `sizes` attribute describing the rendered width at each breakpoint. The browser selects the most efficient file for the current screen: a phone on a narrow viewport fetches the 400px variant; a retina desktop fetches the 800px. A visitor on slow cellular does not download a 1600-pixel image they will never see at full resolution. Bandwidth spent on pixels never seen is weight the page was not asked to carry.
+
+**Native lazy loading.** `loading="lazy"` defers the fetch until the image is within the browser's native threshold — typically 1200px from the viewport, configurable by the browser, not by the developer. This is not JavaScript. It is a browser primitive, implemented in the network layer, before layout, costing nothing on the main thread. `decoding="async"` further ensures that converting compressed bytes to visible pixels does not block the frame between paints. The images load; the rest of the page does not wait.
+
+**The emoji and the fallback.** The `.project-image` div — the emoji — lives as an absolutely-positioned layer inside the `<figure>`. It is not a placeholder to be discarded once the real image arrives. For visitors who never load images (data-savers, readers offline after the first visit, portrait contexts where the thumbnail doesn't reach the viewport), the emoji *is* the design. When `.is-loaded` fires on the `<img>`, JavaScript adds `.has-image` to the `<figure>`. A CSS rule targets `.project-thumb.has-image .project-image` and fades the emoji to `opacity: 0`. The photograph and the emoji animate in parallel — the image arriving, the symbol yielding — at slightly different speeds so neither abruptly vanishes.
+
+**The `alt` attribute.** Every project thumbnail carries `alt=""` — not a missing attribute, but an explicitly empty one. The distinction matters to screen readers: `alt=""` marks the image as *decorative*. The semantic content — title, description, tags — is already present in the card's headings. The image, when it exists, adds only visual texture. Its absence, announced by an empty `alt`, tells assistive technology: *there is nothing here that you are missing.*
+
+**No-JS safety.** The reveal animation (`opacity: 0 → 1`) is a CSS rule, set permanently. Without JavaScript, `.is-loaded` is never added and every project thumbnail remains invisible. A `<noscript>` tag in the `<head>` overrides this with `opacity: 1 !important` — so the portfolio looks correct in environments where JavaScript is unavailable.
+
+**Adding a project image.** Create two WebP files and one JPEG per project. Name them following the pattern below and drop them into the `images/` folder:
+
+```
+images/
+├── luminary-400.webp    400px wide — served to narrow viewports
+├── luminary-800.webp    800px wide — served to wide viewports
+├── luminary.jpg         JPEG fallback for non-WebP browsers
+├── verdant-400.webp
+├── verdant-800.webp
+├── verdant.jpg
+├── pulse-400.webp
+├── pulse-800.webp
+└── pulse.jpg
+```
+
+The `<picture>` element is already in the HTML. The emoji fallback is already visible. When the files exist, the reveal plays automatically. No JavaScript changes. No CSS changes. One folder, three pairs of images, and the portfolio becomes photographic.
+
+```html
+<!-- The picture element: WebP first, JPEG fallback, browser decides -->
+<picture class="project-thumb__picture">
+  <source type="image/webp"
+          srcset="images/luminary-400.webp 400w,
+                  images/luminary-800.webp 800w"
+          sizes="(max-width: 900px) 100vw, 45vw" />
+  <img src="images/luminary.jpg"
+       alt=""
+       width="800" height="450"
+       loading="lazy"
+       decoding="async"
+       class="project-thumb__img img-reveal" />
+</picture>
+```
+
+```js
+// The reveal — a print surfacing in developer fluid
+img.addEventListener('load', function () {
+  img.classList.add('is-loaded');   // image fades in over 650ms
+  thumb.classList.add('has-image'); // emoji fades out over 450ms
+}, { once: true });
+```
+
+---
+
 ## Multilingual Support — How It Works
 
 A portfolio speaks one language. But a person holds more than one inside them.
@@ -443,6 +503,7 @@ glassmorphism-portfolio/
 ├── style.css      design token system, glass utility, both themes, markdown typography
 ├── script.js      magnetic cursor, typed headline, theme toggle, particles, modals, blog
 ├── posts.js       writing content — add new entries here, Markdown rendered at runtime
+├── images/        project thumbnails — add WebP pairs + JPEG fallbacks here (see Image Optimisation)
 ├── lang.js        all UI strings in EN and ES — add a language by adding one object
 ├── manifest.json  PWA manifest — app identity, icons, theme colour, display mode
 ├── sw.js          service worker — cache-first strategy, offline reading
@@ -570,7 +631,7 @@ Ordered by emotional impact on the viewer.
 - [x] **Blog / writing section** — thoughts rendered from Markdown; the voice behind the work
 - [x] **PWA support** — `manifest.json` and a service worker for offline reading
 - [x] **Multilingual support** — a second language, a second self
-- [ ] **Image optimisation** — WebP with `srcset`, native lazy loading
+- [x] **Image optimisation** — WebP with `srcset`, native lazy loading
 
 ---
 

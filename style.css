@@ -1104,18 +1104,57 @@ nav.scrolled {
   transform: translateY(-6px);
 }
 
-.project-image {
+/* ── Project thumbnail — the image arrives when the reader does ── */
+.project-thumb {
+  position: relative;
+  overflow: hidden;
   width: 100%;
   height: 160px;
   border-radius: var(--radius-md);
   background: var(--gradient-project-img);
   border: 1px solid var(--glass-border);
+  margin-bottom: 20px;
+  transition: border-color 0.45s ease;
+}
+
+.project-thumb__picture {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The photograph — invisible until the load event fires */
+.project-thumb__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  opacity: 0;
+  transition: opacity 0.65s ease;
+}
+
+.project-thumb__img.is-loaded {
+  opacity: 1;
+}
+
+/* The emoji — holds the frame until the photograph takes its place  */
+/* .project-image kept as the querySelector target for the modal IIFE */
+.project-image {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2.5rem;
-  margin-bottom: 20px;
-  transition: border-color 0.45s ease;
+  transition: opacity 0.45s ease;
+}
+
+/* When the photograph arrives, the emoji quietly yields */
+.project-thumb.has-image .project-image {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .project-card h3 {

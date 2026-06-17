@@ -799,6 +799,33 @@ document.querySelectorAll('.glass').forEach((card) => {
   });
 }());
 
+// ─── Image optimisation — lazy reveal ───────────────────────────
+// The emoji holds the frame until the photograph arrives.
+// When the browser delivers the image, it does not snap into place —
+// it surfaces slowly, opacity rising over 650ms, like a print
+// emerging in developer. The emoji yields in parallel, unhurried.
+(function () {
+  const imgs = Array.from(document.querySelectorAll('.img-reveal'));
+  if (!imgs.length) return;
+
+  function reveal(img) {
+    img.classList.add('is-loaded');
+    const thumb = img.closest('.project-thumb');
+    if (thumb) thumb.classList.add('has-image');
+  }
+
+  imgs.forEach(function (img) {
+    // Images already in the cache may be complete before this script runs
+    if (img.complete) {
+      if (img.naturalWidth > 0) reveal(img); // cached and loaded
+      // naturalWidth === 0 means the fetch failed — emoji fallback stays
+      return;
+    }
+    img.addEventListener('load',  function () { reveal(img); }, { once: true });
+    // No error handler needed: on 404 the fallback emoji is already visible
+  });
+}());
+
 // ─── Multilingual support ────────────────────────────────────────
 // Two tongues. One self. The button shows the language you have
 // not yet chosen — pressing it is the act of crossing over.

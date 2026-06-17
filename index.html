@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <!-- No-JS: reveal project images immediately if the reveal IIFE cannot run -->
+  <noscript><style>.project-thumb__img { opacity: 1 !important; }</style></noscript>
   <!-- PWA manifest & theme -->
   <link rel="manifest" href="./manifest.json" />
   <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
@@ -222,7 +224,21 @@
         <div class="glass project-card reveal"
              role="button" tabindex="0" aria-haspopup="dialog"
              data-detail="A complete design-to-code engagement for a B2B analytics platform serving data teams across three continents. The work spanned a component library of 48 elements, a real-time chart engine hand-built without third-party dependencies, and a dark mode careful enough to account for the eye's slower adaptation to blue light at night. The goal: a dashboard that analysts could look at for eight hours without fatigue — calm under pressure, honest with complexity.">
-          <div class="project-image">📊</div>
+          <figure class="project-thumb">
+            <picture class="project-thumb__picture">
+              <source type="image/webp"
+                      srcset="images/luminary-400.webp 400w,
+                              images/luminary-800.webp 800w"
+                      sizes="(max-width: 900px) 100vw, 45vw" />
+              <img src="images/luminary.jpg"
+                   alt=""
+                   width="800" height="450"
+                   loading="lazy"
+                   decoding="async"
+                   class="project-thumb__img img-reveal" />
+            </picture>
+            <div class="project-image" aria-hidden="true">📊</div>
+          </figure>
           <h3>Luminary — Analytics Dashboard</h3>
           <p>
             End-to-end design and frontend build for a B2B SaaS analytics platform.
@@ -239,7 +255,21 @@
         <div class="glass project-card reveal"
              role="button" tabindex="0" aria-haspopup="dialog"
              data-detail="A full UX audit and storefront redesign for a direct-to-consumer sustainable brand. The work began with session recordings and scroll heatmaps — watching strangers navigate the old site, noticing where they hesitated, where they left. Three friction points in the checkout flow accounted for most of the abandonment. The redesign was quiet rather than flashy: clearer hierarchy, less noise, a checkout that asked fewer questions. Conversion improved 34% in the first four weeks.">
-          <div class="project-image">🌿</div>
+          <figure class="project-thumb">
+            <picture class="project-thumb__picture">
+              <source type="image/webp"
+                      srcset="images/verdant-400.webp 400w,
+                              images/verdant-800.webp 800w"
+                      sizes="(max-width: 900px) 100vw, 45vw" />
+              <img src="images/verdant.jpg"
+                   alt=""
+                   width="800" height="450"
+                   loading="lazy"
+                   decoding="async"
+                   class="project-thumb__img img-reveal" />
+            </picture>
+            <div class="project-image" aria-hidden="true">🌿</div>
+          </figure>
           <h3>Verdant — E-commerce Store</h3>
           <p>
             Shopify storefront redesign for a sustainable lifestyle brand. Improved
@@ -256,7 +286,21 @@
         <div class="glass project-card reveal"
              role="button" tabindex="0" aria-haspopup="dialog"
              data-detail="A cross-platform fitness application built for a personal training startup launching simultaneously on iOS and Android. The custom animation system replaced default spring physics with hand-tuned curves — motion that feels like the body moving, not a UI sliding. Offline support was non-negotiable: users train in basements, in garages, in places with no signal. The app had to hold what it knew and work with whatever was there.">
-          <div class="project-image">📱</div>
+          <figure class="project-thumb">
+            <picture class="project-thumb__picture">
+              <source type="image/webp"
+                      srcset="images/pulse-400.webp 400w,
+                              images/pulse-800.webp 800w"
+                      sizes="(max-width: 900px) 100vw, 45vw" />
+              <img src="images/pulse.jpg"
+                   alt=""
+                   width="800" height="450"
+                   loading="lazy"
+                   decoding="async"
+                   class="project-thumb__img img-reveal" />
+            </picture>
+            <div class="project-image" aria-hidden="true">📱</div>
+          </figure>
           <h3>Pulse — Fitness Mobile App</h3>
           <p>
             React Native app for a personal training startup. Custom animation system,
