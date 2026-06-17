@@ -35,7 +35,7 @@ themeToggle.addEventListener('click', () => {
   const glow = document.getElementById('cursorGlow');
 
   const MAGNETIC_RADIUS   = 140;   // px  — field of attraction around each card
-  const MAGNETIC_STRENGTH = 0.32;  // 0–1 — fraction of pull at the very centre
+  const MAGNETIC_STRENGTH = 0.16;  // 0–1 — fraction of pull at the very centre
   const lerp = (a, b, t) => a + (b - a) * t;
 
   let mouseX = 0, mouseY = 0;
@@ -117,13 +117,14 @@ themeToggle.addEventListener('click', () => {
       }
     });
 
-    // Dot follows the magnetic target with light lag — feels tethered, alive
-    dotX = lerp(dotX, targetX, 0.50);
-    dotY = lerp(dotY, targetY, 0.50);
+    // Dot follows the magnetic target unhurried — a vessel correcting
+    // course, never snapping to it
+    dotX = lerp(dotX, targetX, 0.22);
+    dotY = lerp(dotY, targetY, 0.22);
 
     // Glow drifts behind the dot — slower, heavier, like light spilled on water
-    glowX = lerp(glowX, dotX, 0.07);
-    glowY = lerp(glowY, dotY, 0.07);
+    glowX = lerp(glowX, dotX, 0.06);
+    glowY = lerp(glowY, dotY, 0.06);
 
     dot.style.left  = dotX  + 'px';
     dot.style.top   = dotY  + 'px';
@@ -688,22 +689,28 @@ const skillObserver = new IntersectionObserver(
 const skillsSection = document.querySelector('.skills-section');
 if (skillsSection) skillObserver.observe(skillsSection);
 
-// ─── Tilt on glass cards (subtle mouse tracking) ───────────────
+// ─── Tilt on glass cards (a held angle, not a flinch) ───────────
+// The lean is small — the kind a careful hand gives an object,
+// not the snap of a hinge. Large panels are excluded: a surface
+// that size reads as architecture, not something held.
+const TILT_MAX = 3.5; // deg — barely perceptible, deliberate
 document.querySelectorAll('.glass').forEach((card) => {
+  if (card.matches('.skills-section, .contact-card')) return;
+
   card.addEventListener('mousemove', (e) => {
     const rect = card.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 10;
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -10;
-    card.style.transform = `perspective(600px) rotateY(${x}deg) rotateX(${y}deg) translateY(-4px)`;
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * TILT_MAX;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -TILT_MAX;
+    card.style.transform = `perspective(800px) rotateY(${x}deg) rotateX(${y}deg) translateY(-3px)`;
   });
 
   card.addEventListener('mouseleave', () => {
     card.style.transform = '';
-    card.style.transition = 'transform 0.5s ease';
+    card.style.transition = 'transform 0.6s ease';
   });
 
   card.addEventListener('mouseenter', () => {
-    card.style.transition = 'transform 0.1s ease';
+    card.style.transition = 'transform 0.3s ease';
   });
 });
 

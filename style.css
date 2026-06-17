@@ -377,7 +377,7 @@ nav.scrolled {
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.30);
-  transition: transform 0.52s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.6s cubic-bezier(0.22, 1.06, 0.45, 1);
 }
 
 [data-theme="light"] .toggle-thumb {
@@ -464,11 +464,11 @@ nav.scrolled {
   z-index: 10001;
   mix-blend-mode: screen;   /* haunts dark surfaces without a hard edge */
   transition:
-    width            0.25s ease,
-    height           0.25s ease,
+    width            0.4s ease,
+    height           0.4s ease,
     opacity          0.35s ease,
     background-color 0.45s ease,
-    filter           0.25s ease;
+    filter           0.4s ease;
 }
 
 /* screen blend vanishes on cream — switch to normal in light mode */
@@ -487,9 +487,9 @@ nav.scrolled {
   );
   z-index: 10000;
   transition:
-    width   0.55s ease,
-    height  0.55s ease,
-    opacity 0.45s ease;
+    width   0.7s ease,
+    height  0.7s ease,
+    opacity 0.5s ease;
 }
 
 /* ── Visible after first move ───────────────────────────────────── */
@@ -498,38 +498,38 @@ nav.scrolled {
 
 /* ── Near a glass card — the moth finds the light ──────────────── */
 .cursor-dot.is-near-glass {
-  width: 14px;
-  height: 14px;
-  filter: brightness(1.5);
+  width: 11px;
+  height: 11px;
+  filter: brightness(1.3);
 }
 .cursor-glow.is-near-glass {
-  width: 110px;
-  height: 110px;
-  opacity: 0.50;
+  width: 82px;
+  height: 82px;
+  opacity: 0.42;
 }
 
 /* ── Hovering a link / button — precision contracts ────────────── */
 .cursor-dot.is-interactive {
-  width: 5px;
-  height: 5px;
-  filter: brightness(1.9);
+  width: 6px;
+  height: 6px;
+  filter: brightness(1.45);
 }
 .cursor-glow.is-interactive {
-  width: 70px;
-  height: 70px;
-  opacity: 0.40;
+  width: 62px;
+  height: 62px;
+  opacity: 0.36;
 }
 
 /* ── Pressing — the point concentrates into a spark ────────────── */
 .cursor-dot.is-clicking {
-  width: 4px;
-  height: 4px;
-  filter: brightness(2.6);
+  width: 5px;
+  height: 5px;
+  filter: brightness(1.8);
 }
 .cursor-glow.is-clicking {
-  width: 28px;
-  height: 28px;
-  opacity: 0.90;
+  width: 34px;
+  height: 34px;
+  opacity: 0.70;
 }
 
 /* ─── Typewriter headline ────────────────────────────────────────
@@ -619,10 +619,10 @@ nav.scrolled {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transform: scale(0.94) translateY(28px);
+  transform: scale(0.96) translateY(20px);
   opacity: 0;
   transition:
-    transform        0.46s cubic-bezier(0.34, 1.26, 0.64, 1),
+    transform        0.55s cubic-bezier(0.16, 1, 0.3, 1),
     opacity          0.38s ease,
     border-color     0.45s ease,
     background-color 0.45s ease,
