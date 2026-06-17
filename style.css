@@ -1306,6 +1306,24 @@ footer a {
   transition: color 0.45s ease;
 }
 
+/* ─── Particle canvas ───────────────────────────────────────────
+   Behind the orbs. Behind the glass. Barely there.
+   The constellation breathes below everything else,
+   a layer the eye only notices when it stops looking.
+   ────────────────────────────────────────────────────────────── */
+#particleCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.8s ease;
+}
+
+#particleCanvas.is-ready {
+  opacity: 1;
+}
+
 /* ─── Scroll reveal ────────────────────────────────────────────── */
 /* Initial hidden state. GSAP owns the animation — no CSS transition
    needed here. If GSAP fails, the JS fallback reveals all elements

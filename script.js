@@ -383,6 +383,166 @@ window.addEventListener('scroll', () => {
   });
 }());
 
+// ─── Ambient particle field ─────────────────────────────────────
+// Stars do not hurry. They drift at a speed the eye cannot quite
+// follow, trailing faint lines between near-neighbours — connections
+// that form and dissolve like thoughts not quite held. Behind the
+// orbs. Behind the glass. The thing you see when you stop looking.
+(function () {
+  const canvas = document.getElementById('particleCanvas');
+  if (!canvas) return;
+
+  // Motion-sensitive users see nothing — the stillness is its own answer
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    canvas.style.display = 'none';
+    return;
+  }
+
+  const ctx   = canvas.getContext('2d');
+  const htmlEl = document.documentElement;
+
+  // ── Constants ─────────────────────────────────────────────────────
+  const COUNT    = 55;    // sparse — the negative space carries the weight
+  const MAX_SPD  = 0.28;  // px/frame — slower than a minute hand
+  const JITTER   = 0.008; // random-walk delta — keeps drift organic
+  const LINK_R   = 140;   // px — constellation connection threshold
+  const LINE_OPA = 0.13;  // max line opacity — a whisper, not a voice
+
+  // ── Per-theme accent colours ──────────────────────────────────────
+  // Dark: #7c9cff cold periwinkle   Light: #5d7a9e dusty slate
+  const DARK_COL  = { r: 124, g: 156, b: 255 };
+  const LIGHT_COL = { r:  93, g: 122, b: 158 };
+
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  // Colour lerps from current toward target on every frame —
+  // theme transitions play out over ~2s after the CSS switch.
+  let col    = Object.assign({}, htmlEl.dataset.theme === 'light' ? LIGHT_COL : DARK_COL);
+  let target = Object.assign({}, col);
+
+  // ── Canvas sizing — DPR-aware ──────────────────────────────────────
+  let W, H, dpr;
+
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    W   = window.innerWidth;
+    H   = window.innerHeight;
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // reset + apply DPR — no accumulated drift
+  }
+
+  // ── Spawn one particle at (x, y) ──────────────────────────────────
+  function make(x, y) {
+    const angle = Math.random() * Math.PI * 2;
+    const spd   = 0.05 + Math.random() * MAX_SPD;
+    return {
+      x, y,
+      vx:    Math.cos(angle) * spd,
+      vy:    Math.sin(angle) * spd,
+      r:     0.7  + Math.random() * 1.7,    // 0.7 – 2.4 px  — motes to small lights
+      alpha: 0.22 + Math.random() * 0.44,   // 0.22 – 0.66  — none fully visible
+      phase: Math.random() * Math.PI * 2,   // breath phase — unique per particle
+      bpm:   0.005 + Math.random() * 0.009, // breathing speed — no two pulse alike
+      px:    0,                              // pulsed alpha, computed each frame
+    };
+  }
+
+  // ── Initialise ────────────────────────────────────────────────────
+  let particles;
+
+  function init() {
+    resize();
+    particles = Array.from({ length: COUNT }, () =>
+      make(Math.random() * W, Math.random() * H)
+    );
+    // Emerge slowly — no sudden arrival, no announcement
+    setTimeout(() => canvas.classList.add('is-ready'), 200);
+  }
+
+  // ── Animation loop ────────────────────────────────────────────────
+  function tick() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Colour lerp toward theme target — smooth, unhurried shift
+    col.r = lerp(col.r, target.r, 0.03);
+    col.g = lerp(col.g, target.g, 0.03);
+    col.b = lerp(col.b, target.b, 0.03);
+    const cr = col.r | 0;
+    const cg = col.g | 0;
+    const cb = col.b | 0;
+
+    // ── Update — positions, random walk, wrapping, breath ───────────
+    particles.forEach((p) => {
+      p.vx += (Math.random() - 0.5) * JITTER;
+      p.vy += (Math.random() - 0.5) * JITTER;
+      const s = Math.hypot(p.vx, p.vy);
+      if (s > MAX_SPD) { p.vx = p.vx / s * MAX_SPD; p.vy = p.vy / s * MAX_SPD; }
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Seamless edge wrap — particles reappear on the opposite side
+      if (p.x < -24) p.x = W + 24;
+      if (p.x > W + 24) p.x = -24;
+      if (p.y < -24) p.y = H + 24;
+      if (p.y > H + 24) p.y = -24;
+
+      // Breathed opacity — stored so line drawing can share the value
+      p.px = p.alpha * (0.50 + 0.50 * Math.sin(p.phase));
+      p.phase += p.bpm;
+    });
+
+    // ── Constellation lines — behind particles, first in paint order ─
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx   = particles[j].x - particles[i].x;
+        const dy   = particles[j].y - particles[i].y;
+        const dist = Math.hypot(dx, dy);
+        if (dist >= LINK_R) continue;
+
+        const a = (1 - dist / LINK_R) * LINE_OPA;
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(${cr},${cg},${cb},${a.toFixed(3)})`;
+        ctx.lineWidth   = 0.5;
+        ctx.stroke();
+      }
+    }
+
+    // ── Particles — on top of lines, breathing independently ────────
+    particles.forEach((p) => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${cr},${cg},${cb},${p.px.toFixed(3)})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(tick);
+  }
+
+  // ── Wire up ───────────────────────────────────────────────────────
+  init();
+  tick();
+
+  window.addEventListener('resize', resize);
+
+  // When the theme toggles, point the colour lerp at its new target.
+  // The canvas drifts into its new palette over ~2 seconds — longer
+  // than the CSS transition, so the stars are the last thing to change.
+  const toggleBtn = document.getElementById('themeToggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      requestAnimationFrame(() => {
+        target = Object.assign({}, htmlEl.dataset.theme === 'light' ? LIGHT_COL : DARK_COL);
+      });
+    });
+  }
+}());
+
 // ─── Skill bars ─────────────────────────────────────────────────
 const skillObserver = new IntersectionObserver(
   (entries) => {

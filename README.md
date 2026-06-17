@@ -64,6 +64,7 @@ In light mode the glass warms: higher opacity, amber tint, sepia shadow. The sam
 | ✓ | **Project detail modals** | Click a card; the world blurs into a glass overlay. Backdrop `backdrop-filter` transitions from `blur(0)` to `blur(20px)`. Panel enters at `scale(0.94)` and rises. Escape / outside-click closes. Focus trapped, scroll locked. |
 | ✓ | **Staggered section transitions** | GSAP + ScrollTrigger. Hero fades in on load. Every section below the fold staggers its children at 80ms intervals, `power3.out`. `clearProps: 'transform'` hands control back to card-tilt. CDN-fail and `prefers-reduced-motion` safe. |
 | ✓ | **Real contact backend** | Formspree integration. One `const FORM_ENDPOINT` at the top of `script.js`. Three states: `is-sending` (pulse animation), `is-sent` (green), `is-error` (rose + fallback email link). Status line fades up via `aria-live`. Demo mode when endpoint is empty. |
+| ✓ | **Ambient particle field** | 55-particle `<canvas>` constellation behind the orbs. Random-walk drift at ≤ 0.28 px/frame. Independent sine-wave breathing per particle. Constellation lines at ≤ 0.5px, fading with distance. Theme-colour lerp over ~2s. DPR-aware. `prefers-reduced-motion` silent. |
 | ✓ | **Glassmorphism card system** | `.glass` utility — backdrop blur, translucent fill, luminous border, soft shadow |
 | ✓ | **Floating hero card** | Sine-wave float animation with subtle 3-axis mouse tilt |
 | ✓ | **Scroll reveal** | `IntersectionObserver` — elements rise as they enter the viewport |
@@ -152,6 +153,38 @@ themeToggle.addEventListener('click', () => {
   localStorage.setItem('theme', next);
   setTimeout(() => html.classList.remove('theme-transitioning'), 700);
 });
+```
+
+---
+
+## Ambient Particle Field — How It Works
+
+The portfolio already holds depth — orbs glowing behind the glass, a cursor that bends toward surfaces. But depth implies distance, and distance implies something between. The particle field is that something: 55 near-still points drifting through the dark, trailing faint lines between near-neighbours that form and dissolve like thoughts not quite held. It does not ask to be noticed. It is the thing you see when you stop looking at everything else.
+
+**The count.** 55 was not arbitrary. Enough to form occasional constellations — three or four particles sometimes close enough to draw a triangle, a line, a shape without a name. Sparse enough that negative space dominates. The emptiness between them is the art. At 200 particles the effect becomes noise; at 20 it becomes nothing. 55 is the point where the eye can still follow an individual particle if it chooses.
+
+**The drift.** Each frame, a small random delta (±0.004) perturbs each particle's velocity in both axes — a Brownian random walk. Velocity magnitude is clamped at 0.28 px per frame (≈ 17 pixels per second at 60fps). Across a full 1920px screen, a particle crosses in nearly two minutes. It is not movement. It is the memory of movement. This slowness is the entire feeling.
+
+**The breathing.** Every particle carries a unique `phase` offset and `bpm` (breathing rate in radians per frame). Its rendered opacity oscillates between 0 and its base alpha via `alpha * (0.5 + 0.5 * Math.sin(phase))`. No two particles pulse together. The result is the quality of something alive but not performing — the way a room of sleeping people breathes at their own pace, without synchrony, without intention.
+
+**The constellation lines.** Any two particles within 140px are connected by a 0.5px hairline. The line's opacity is `(1 - dist/140) * 0.13` — at maximum proximity, 13% opacity; at the edge of range, zero. Lines are more transparent than the particles themselves. They are not drawn between things; they hint at proximity, at the mere fact of being near. The lines dissolve before they disappear.
+
+**The colour shift.** On page load, the particles match the current theme's accent colour. When the theme toggles, the canvas does not snap to the new colour — it lerps at `t = 0.03` per frame, a colour transition that plays out over approximately 120 frames ≈ 2 seconds. The CSS theme crossfade completes in 0.7 seconds; the particles take nearly three times as long. The stars are the last thing to change. They settle into their new atmosphere after everything else has already moved on.
+
+**DPR & resize.** The canvas is drawn at `window.devicePixelRatio` — on a 2× retina screen, each "pixel" is rendered at physical double resolution. `ctx.setTransform(dpr, 0, 0, dpr, 0, 0)` (not `scale`) is called on every resize: it resets the transformation matrix before reapplying DPR, preventing accumulated drift from multiple resize events.
+
+**The fade-in.** The canvas begins at `opacity: 0` and transitions to `1` over 1.8 seconds, starting 200ms after init. Particles first become visible after the page has formed its first impression. They do not announce themselves.
+
+```js
+// Each particle breathes alone — no two in phase
+p.px = p.alpha * (0.50 + 0.50 * Math.sin(p.phase));
+p.phase += p.bpm;
+
+// The line between them: proximity as opacity
+const a = (1 - dist / LINK_R) * LINE_OPA;
+
+// The colour follows the theme — slowly, like stars adjusting to a new sky
+col.r = lerp(col.r, target.r, 0.03); // ~2s to complete
 ```
 
 ---
@@ -336,6 +369,11 @@ The light-mode accent lives in `[data-theme="light"]` and follows the same patte
 | **Pause after full word** | Word complete | 2800ms | The long breath |
 | **Pause after full erase** | Word erased | 420ms | The short breath |
 | **Cursor blink** | Idle / pause | 1060ms cycle | `ease-in-out` |
+| **Particle field fade-in** | Page load | 1800ms | `ease`, 200ms delay |
+| **Particle drift** | Loop (RAF) | per-frame | Random walk, clamped at 0.28 px/frame |
+| **Particle breath** | Loop (RAF) | 0.005–0.014 rad/frame | Sine wave, independent per particle |
+| **Particle colour lerp** | Theme toggle | ~2s / ~120 frames | Linear, `t = 0.03` per frame |
+| **Constellation line** | Proximity ≤ 140px | n/a | Opacity = `(1 − dist/140) × 0.13` |
 | **Hero reveal — text** | Page load | 900ms | `power2.out`, delay 220ms |
 | **Hero reveal — card** | Page load | 900ms | `power2.out`, delay 400ms |
 | **Section child stagger** | Scroll (section top at 84vh) | 850ms per element | `power3.out`, 80ms between children |
@@ -391,7 +429,7 @@ Ordered by emotional impact on the viewer.
 - [x] **Project detail modals** — click a card; the world behind it blurs into a glass overlay
 - [x] **Staggered section transitions** — sections drift in with GSAP timelines, each child delayed by 80ms
 - [x] **Real contact backend** — wire the form to Formspree or EmailJS; one environment variable
-- [ ] **Ambient particle field** — a slow, sparse `<canvas>` constellation behind the orbs
+- [x] **Ambient particle field** — a slow, sparse `<canvas>` constellation behind the orbs
 - [ ] **Blog / writing section** — thoughts rendered from Markdown; the voice behind the work
 - [ ] **PWA support** — `manifest.json` and a service worker for offline reading
 - [ ] **Multilingual support** — a second language, a second self
