@@ -5,28 +5,163 @@
   padding: 0;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS — DARK (default)
+   Cold depth. The quiet of a city at 3 a.m.
+   ═══════════════════════════════════════════════════════════════ */
 :root {
-  --bg-start:   #0a0a0a;
-  --bg-mid:     #1a1a2e;
-  --bg-end:     #16213e;
+  /* Page gradients */
+  --bg-dark-start:  #0a0a0a;
+  --bg-dark-mid:    #1a1a2e;
+  --bg-dark-end:    #16213e;
+  --bg-light-start: #ede8df;
+  --bg-light-mid:   #e5ddd0;
+  --bg-light-end:   #dbd3c5;
 
-  --glass-bg:       rgba(255, 255, 255, 0.05);
-  --glass-bg-hover: rgba(255, 255, 255, 0.09);
-  --glass-border:   rgba(255, 255, 255, 0.12);
-  --glass-shadow:   0 8px 32px 0 rgba(0, 0, 0, 0.45);
-  --glass-blur:     20px;
+  /* Glass system */
+  --glass-bg:           rgba(255, 255, 255, 0.05);
+  --glass-bg-hover:     rgba(255, 255, 255, 0.09);
+  --glass-border:       rgba(255, 255, 255, 0.12);
+  --glass-border-hover: rgba(255, 255, 255, 0.24);
+  --glass-shadow:       0 8px 32px 0 rgba(0, 0, 0, 0.45);
+  --glass-shadow-hover: 0 12px 48px 0 rgba(0, 0, 0, 0.55);
+  --glass-blur:         20px;
 
-  --accent:     #7c9cff;
-  --accent-dim: rgba(124, 156, 255, 0.15);
+  /* Accent — cool periwinkle blue */
+  --accent:              #7c9cff;
+  --accent-dim:          rgba(124, 156, 255, 0.15);
+  --accent-border:       rgba(124, 156, 255, 0.25);
+  --accent-border-focus: rgba(124, 156, 255, 0.60);
+  --accent-btn-bg:       rgba(124, 156, 255, 0.20);
+  --accent-btn-hover:    rgba(124, 156, 255, 0.38);
+  --accent-glow:         rgba(124, 156, 255, 0.22);
+
+  /* Typography */
   --text-primary:   #f0f0f0;
   --text-secondary: #9ba3b8;
   --text-muted:     #5a6278;
 
+  /* Theme-aware gradients */
+  --gradient-name:        linear-gradient(135deg, #f0f0f0 0%, #7c9cff 60%, #a78bfa 100%);
+  --gradient-accent:      linear-gradient(135deg, #7c9cff, #a78bfa);
+  --gradient-skill:       linear-gradient(90deg,  #7c9cff, #a78bfa);
+  --gradient-submit:      linear-gradient(135deg, rgba(124, 156, 255, 0.25), rgba(167, 139, 250, 0.25));
+  --gradient-project-img: linear-gradient(135deg, rgba(124, 156, 255, 0.12), rgba(167, 139, 250, 0.12));
+
+  /* Nav */
+  --nav-scrolled-bg: rgba(10, 10, 10, 0.65);
+
+  /* Form */
+  --input-bg:       rgba(255, 255, 255, 0.04);
+  --input-bg-focus: rgba(124, 156, 255, 0.05);
+
+  /* Skill track */
+  --skill-track: rgba(255, 255, 255, 0.06);
+
+  /* Orbs — solid colors + filter: blur() creates the ambient glow */
+  --orb-1-color: #3a4fd7;
+  --orb-2-color: #6b3fa0;
+  --orb-3-color: #1a4a8a;
+  --orb-opacity: 0.18;
+
+  /* Geometry */
   --radius-lg: 24px;
   --radius-md: 16px;
   --radius-sm: 10px;
   --transition: 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS — LIGHT  "Warm Fog"
+   The quiet after a long rain. Afternoon light through old linen.
+   Pages of a book left open on a windowsill. The feeling of aged
+   objects — warm, unhurried, and a little sad.
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme="light"] {
+  /* Glass — warm frosted amber, like old church windows */
+  --glass-bg:           rgba(255, 251, 244, 0.52);
+  --glass-bg-hover:     rgba(255, 251, 244, 0.72);
+  --glass-border:       rgba(170, 155, 130, 0.28);
+  --glass-border-hover: rgba(155, 135, 105, 0.52);
+  --glass-shadow:       0 8px 32px 0 rgba(60, 45, 28, 0.10);
+  --glass-shadow-hover: 0 12px 48px 0 rgba(60, 45, 28, 0.18);
+  --glass-blur:         28px;
+
+  /* Accent — dusty slate periwinkle, melancholic and still */
+  --accent:              #5d7a9e;
+  --accent-dim:          rgba(93, 122, 158, 0.10);
+  --accent-border:       rgba(93, 122, 158, 0.28);
+  --accent-border-focus: rgba(93, 122, 158, 0.62);
+  --accent-btn-bg:       rgba(93, 122, 158, 0.14);
+  --accent-btn-hover:    rgba(93, 122, 158, 0.28);
+  --accent-glow:         rgba(93, 122, 158, 0.18);
+
+  /* Typography — warm ink on aged paper */
+  --text-primary:   #221e17;
+  --text-secondary: #6b5f52;
+  --text-muted:     #a09080;
+
+  /* Gradients shift to warm earth and dusty mauve */
+  --gradient-name:        linear-gradient(135deg, #221e17 0%, #5d7a9e 55%, #7a6fa8 100%);
+  --gradient-accent:      linear-gradient(135deg, #5d7a9e, #8a7ea8);
+  --gradient-skill:       linear-gradient(90deg,  #5d7a9e, #8a7ea8);
+  --gradient-submit:      linear-gradient(135deg, rgba(93, 122, 158, 0.20), rgba(130, 110, 165, 0.20));
+  --gradient-project-img: linear-gradient(135deg, rgba(93, 122, 158, 0.10), rgba(130, 110, 165, 0.10));
+
+  /* Nav */
+  --nav-scrolled-bg: rgba(237, 232, 223, 0.85);
+
+  /* Form — parchment warmth */
+  --input-bg:       rgba(255, 251, 244, 0.65);
+  --input-bg-focus: rgba(93, 122, 158, 0.07);
+
+  /* Skill track */
+  --skill-track: rgba(60, 45, 28, 0.08);
+
+  /* Orbs shift to warm amber dust, misty mauve, and sea-fog slate */
+  --orb-1-color: #c8b490;
+  --orb-2-color: #b098b8;
+  --orb-3-color: #8ca0b4;
+  --orb-opacity: 0.32;
+}
+
+/* ─── Theme-switch crossfade ─────────────────────────────────────
+   Class is toggled on/off by JS for 700ms around each switch.
+   Lets every themed property ease in without touching default
+   animation timings for hover, reveal, and skill bars.
+   ────────────────────────────────────────────────────────────── */
+.theme-transitioning *,
+.theme-transitioning *::before,
+.theme-transitioning *::after {
+  transition-property: background-color, border-color, color, box-shadow, opacity !important;
+  transition-duration: 0.55s !important;
+  transition-timing-function: ease !important;
+}
+
+/* ─── Page background ────────────────────────────────────────────
+   Two fixed gradient layers that crossfade on theme switch.
+   A gradient can't interpolate, so we fade two of them instead.
+   ────────────────────────────────────────────────────────────── */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.70s ease;
+}
+
+.page-bg--dark {
+  background: linear-gradient(135deg, var(--bg-dark-start), var(--bg-dark-mid), var(--bg-dark-end));
+  opacity: 1;
+}
+
+.page-bg--light {
+  background: linear-gradient(135deg, var(--bg-light-start), var(--bg-light-mid), var(--bg-light-end));
+  opacity: 0;
+}
+
+[data-theme="light"] .page-bg--dark  { opacity: 0; }
+[data-theme="light"] .page-bg--light { opacity: 1; }
 
 html {
   scroll-behavior: smooth;
@@ -34,12 +169,11 @@ html {
 
 body {
   font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-  background: linear-gradient(135deg, var(--bg-start), var(--bg-mid), var(--bg-end));
-  background-attachment: fixed;
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
+  transition: color 0.45s ease;
 }
 
 /* ─── Background Orbs ──────────────────────────────────────────── */
@@ -55,27 +189,28 @@ body {
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
-  opacity: 0.18;
+  opacity: var(--orb-opacity);
   animation: orb-drift 18s ease-in-out infinite alternate;
+  transition: background-color 0.70s ease, opacity 0.70s ease;
 }
 
 .orb-1 {
   width: 500px; height: 500px;
-  background: radial-gradient(circle, #3a4fd7, transparent 70%);
+  background-color: var(--orb-1-color);
   top: -10%; left: -5%;
   animation-delay: 0s;
 }
 
 .orb-2 {
   width: 400px; height: 400px;
-  background: radial-gradient(circle, #6b3fa0, transparent 70%);
+  background-color: var(--orb-2-color);
   top: 40%; right: -8%;
   animation-delay: -6s;
 }
 
 .orb-3 {
   width: 350px; height: 350px;
-  background: radial-gradient(circle, #1a4a8a, transparent 70%);
+  background-color: var(--orb-3-color);
   bottom: -5%; left: 30%;
   animation-delay: -12s;
 }
@@ -93,12 +228,16 @@ body {
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--glass-shadow);
+  transition:
+    background-color 0.45s ease,
+    border-color 0.45s ease,
+    box-shadow 0.45s ease;
 }
 
 .glass:hover {
   background: var(--glass-bg-hover);
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.55);
+  border-color: var(--glass-border-hover);
+  box-shadow: var(--glass-shadow-hover);
 }
 
 /* ─── Layout ───────────────────────────────────────────────────── */
@@ -117,16 +256,15 @@ section {
 /* ─── Navigation ───────────────────────────────────────────────── */
 nav {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   z-index: 100;
   padding: 18px 0;
-  transition: var(--transition);
+  transition: background-color var(--transition), border-color var(--transition),
+              backdrop-filter var(--transition);
 }
 
 nav.scrolled {
-  background: rgba(10, 10, 10, 0.6);
+  background: var(--nav-scrolled-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-bottom: 1px solid var(--glass-border);
@@ -144,10 +282,18 @@ nav.scrolled {
   letter-spacing: 0.04em;
   color: var(--text-primary);
   text-decoration: none;
+  transition: color 0.45s ease;
 }
 
 .nav-logo span {
   color: var(--accent);
+  transition: color 0.45s ease;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 28px;
 }
 
 .nav-links {
@@ -168,6 +314,63 @@ nav.scrolled {
 .nav-links a:hover {
   color: var(--text-primary);
 }
+
+/* ─── Theme Toggle ─────────────────────────────────────────────── */
+.theme-toggle {
+  position: relative;
+  width: 54px;
+  height: 29px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 100px;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 0;
+  flex-shrink: 0;
+  transition:
+    background-color 0.45s ease,
+    border-color 0.45s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--glass-border-hover);
+  background: var(--glass-bg-hover);
+}
+
+/* The sliding thumb — spring physics via cubic-bezier overshoot */
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background: var(--gradient-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.30);
+  transition: transform 0.52s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-theme="light"] .toggle-thumb {
+  transform: translateX(25px);
+}
+
+.toggle-icon {
+  width: 12px;
+  height: 12px;
+  color: #ffffff;
+  position: absolute;
+  transition: opacity 0.25s ease, transform 0.35s ease;
+}
+
+.toggle-icon.icon-moon { opacity: 1;  transform: scale(1)   rotate(0deg);   }
+.toggle-icon.icon-sun  { opacity: 0;  transform: scale(0.4) rotate(-60deg); }
+
+[data-theme="light"] .toggle-icon.icon-moon { opacity: 0;  transform: scale(0.4) rotate(60deg);  }
+[data-theme="light"] .toggle-icon.icon-sun  { opacity: 1;  transform: scale(1)   rotate(0deg);   }
 
 /* ─── Hero ─────────────────────────────────────────────────────── */
 #hero {
@@ -192,10 +395,11 @@ nav.scrolled {
   text-transform: uppercase;
   color: var(--accent);
   background: var(--accent-dim);
-  border: 1px solid rgba(124, 156, 255, 0.25);
+  border: 1px solid var(--accent-border);
   border-radius: 100px;
   padding: 6px 16px;
   margin-bottom: 24px;
+  transition: color 0.45s ease, background-color 0.45s ease, border-color 0.45s ease;
 }
 
 .hero-text h1 {
@@ -204,10 +408,12 @@ nav.scrolled {
   line-height: 1.15;
   letter-spacing: -0.02em;
   margin-bottom: 20px;
+  color: var(--text-primary);
+  transition: color 0.45s ease;
 }
 
 .hero-text h1 .name {
-  background: linear-gradient(135deg, #f0f0f0 0%, #7c9cff 60%, #a78bfa 100%);
+  background: var(--gradient-name);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -218,6 +424,7 @@ nav.scrolled {
   color: var(--text-secondary);
   max-width: 420px;
   margin-bottom: 36px;
+  transition: color 0.45s ease;
 }
 
 .hero-actions {
@@ -230,8 +437,8 @@ nav.scrolled {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(124, 156, 255, 0.2);
-  border: 1px solid rgba(124, 156, 255, 0.4);
+  background: var(--accent-btn-bg);
+  border: 1px solid var(--accent-border);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: var(--text-primary);
@@ -241,14 +448,15 @@ nav.scrolled {
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  transition: var(--transition);
+  transition: background-color var(--transition), border-color var(--transition),
+              transform var(--transition), box-shadow var(--transition), color 0.45s ease;
 }
 
 .btn-primary:hover {
-  background: rgba(124, 156, 255, 0.35);
-  border-color: rgba(124, 156, 255, 0.7);
+  background: var(--accent-btn-hover);
+  border-color: var(--accent-border-focus);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(124, 156, 255, 0.2);
+  box-shadow: 0 8px 24px var(--accent-glow);
 }
 
 .btn-ghost {
@@ -266,12 +474,13 @@ nav.scrolled {
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  transition: var(--transition);
+  transition: background-color var(--transition), border-color var(--transition),
+              transform var(--transition), color 0.45s ease;
 }
 
 .btn-ghost:hover {
   color: var(--text-primary);
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: var(--glass-border-hover);
   transform: translateY(-2px);
 }
 
@@ -281,9 +490,6 @@ nav.scrolled {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  position: relative;
-  transition: var(--transition);
-  transform: translateY(0);
   animation: float 6s ease-in-out infinite;
 }
 
@@ -296,7 +502,7 @@ nav.scrolled {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #7c9cff, #a78bfa);
+  background: var(--gradient-accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -310,16 +516,20 @@ nav.scrolled {
   font-size: 1.15rem;
   font-weight: 700;
   margin-bottom: 4px;
+  color: var(--text-primary);
+  transition: color 0.45s ease;
 }
 
 .hero-card-info p {
   font-size: 0.85rem;
   color: var(--text-secondary);
+  transition: color 0.45s ease;
 }
 
 .hero-card-divider {
   height: 1px;
   background: var(--glass-border);
+  transition: background-color 0.45s ease;
 }
 
 .hero-stats {
@@ -334,12 +544,14 @@ nav.scrolled {
   font-weight: 800;
   color: var(--accent);
   display: block;
+  transition: color 0.45s ease;
 }
 
 .stat-label {
   font-size: 0.75rem;
   color: var(--text-muted);
   letter-spacing: 0.05em;
+  transition: color 0.45s ease;
 }
 
 .hero-card-tags {
@@ -356,12 +568,13 @@ nav.scrolled {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   color: var(--text-secondary);
-  transition: var(--transition);
+  transition: color var(--transition), border-color var(--transition),
+              background-color 0.45s ease;
 }
 
 .tag:hover {
   color: var(--accent);
-  border-color: rgba(124, 156, 255, 0.4);
+  border-color: var(--accent-border-focus);
 }
 
 /* ─── Section Header ───────────────────────────────────────────── */
@@ -378,6 +591,7 @@ nav.scrolled {
   text-transform: uppercase;
   color: var(--accent);
   margin-bottom: 14px;
+  transition: color 0.45s ease;
 }
 
 .section-header h2 {
@@ -385,6 +599,8 @@ nav.scrolled {
   font-weight: 800;
   letter-spacing: -0.02em;
   margin-bottom: 14px;
+  color: var(--text-primary);
+  transition: color 0.45s ease;
 }
 
 .section-header p {
@@ -392,6 +608,7 @@ nav.scrolled {
   color: var(--text-secondary);
   max-width: 520px;
   margin: 0 auto;
+  transition: color 0.45s ease;
 }
 
 /* ─── About ────────────────────────────────────────────────────── */
@@ -403,7 +620,6 @@ nav.scrolled {
 
 .about-card {
   padding: 36px;
-  transition: var(--transition);
 }
 
 .about-card-icon {
@@ -411,24 +627,28 @@ nav.scrolled {
   height: 48px;
   border-radius: var(--radius-sm);
   background: var(--accent-dim);
-  border: 1px solid rgba(124, 156, 255, 0.25);
+  border: 1px solid var(--accent-border);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.3rem;
   margin-bottom: 18px;
+  transition: background-color 0.45s ease, border-color 0.45s ease;
 }
 
 .about-card h3 {
   font-size: 1.05rem;
   font-weight: 700;
   margin-bottom: 10px;
+  color: var(--text-primary);
+  transition: color 0.45s ease;
 }
 
 .about-card p {
   font-size: 0.9rem;
   color: var(--text-secondary);
   line-height: 1.7;
+  transition: color 0.45s ease;
 }
 
 /* Skills bar */
@@ -441,6 +661,8 @@ nav.scrolled {
   font-size: 1.05rem;
   font-weight: 700;
   margin-bottom: 24px;
+  color: var(--text-primary);
+  transition: color 0.45s ease;
 }
 
 .skill-item {
@@ -453,22 +675,26 @@ nav.scrolled {
   font-size: 0.85rem;
   font-weight: 500;
   margin-bottom: 8px;
+  color: var(--text-secondary);
+  transition: color 0.45s ease;
 }
 
 .skill-header span:last-child {
   color: var(--accent);
+  transition: color 0.45s ease;
 }
 
 .skill-bar {
   height: 6px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--skill-track);
   border-radius: 100px;
   overflow: hidden;
+  transition: background-color 0.45s ease;
 }
 
 .skill-fill {
   height: 100%;
-  background: linear-gradient(90deg, #7c9cff, #a78bfa);
+  background: var(--gradient-skill);
   border-radius: 100px;
   width: 0;
   transition: width 1.2s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -484,7 +710,8 @@ nav.scrolled {
 .project-card {
   padding: 30px;
   cursor: pointer;
-  transition: var(--transition);
+  transition: transform var(--transition), background-color 0.45s ease,
+              border-color 0.45s ease, box-shadow 0.45s ease;
 }
 
 .project-card:hover {
@@ -495,19 +722,22 @@ nav.scrolled {
   width: 100%;
   height: 160px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, rgba(124, 156, 255, 0.12), rgba(167, 139, 250, 0.12));
+  background: var(--gradient-project-img);
   border: 1px solid var(--glass-border);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2.5rem;
   margin-bottom: 20px;
+  transition: border-color 0.45s ease;
 }
 
 .project-card h3 {
   font-size: 1rem;
   font-weight: 700;
   margin-bottom: 8px;
+  color: var(--text-primary);
+  transition: color 0.45s ease;
 }
 
 .project-card p {
@@ -515,6 +745,7 @@ nav.scrolled {
   color: var(--text-secondary);
   margin-bottom: 18px;
   line-height: 1.65;
+  transition: color 0.45s ease;
 }
 
 .project-tags {
@@ -532,7 +763,7 @@ nav.scrolled {
   font-weight: 600;
   color: var(--accent);
   text-decoration: none;
-  transition: gap var(--transition);
+  transition: gap var(--transition), color 0.45s ease;
 }
 
 .project-link:hover {
@@ -573,11 +804,12 @@ nav.scrolled {
   letter-spacing: 0.04em;
   color: var(--text-secondary);
   text-transform: uppercase;
+  transition: color 0.45s ease;
 }
 
 .form-group input,
 .form-group textarea {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--input-bg);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
@@ -585,7 +817,8 @@ nav.scrolled {
   font-family: inherit;
   padding: 13px 16px;
   outline: none;
-  transition: border-color var(--transition), background var(--transition);
+  transition: border-color var(--transition), background-color var(--transition),
+              color 0.45s ease;
 }
 
 .form-group input::placeholder,
@@ -595,8 +828,8 @@ nav.scrolled {
 
 .form-group input:focus,
 .form-group textarea:focus {
-  border-color: rgba(124, 156, 255, 0.5);
-  background: rgba(124, 156, 255, 0.05);
+  border-color: var(--accent-border-focus);
+  background: var(--input-bg-focus);
 }
 
 .form-group textarea {
@@ -605,8 +838,8 @@ nav.scrolled {
 }
 
 .btn-submit {
-  background: linear-gradient(135deg, rgba(124, 156, 255, 0.25), rgba(167, 139, 250, 0.25));
-  border: 1px solid rgba(124, 156, 255, 0.4);
+  background: var(--gradient-submit);
+  border: 1px solid var(--accent-border);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: var(--text-primary);
@@ -615,16 +848,17 @@ nav.scrolled {
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
-  transition: var(--transition);
+  transition: border-color var(--transition), transform var(--transition),
+              box-shadow var(--transition), color 0.45s ease, filter var(--transition);
   align-self: flex-start;
   font-family: inherit;
   letter-spacing: 0.02em;
 }
 
 .btn-submit:hover {
-  background: linear-gradient(135deg, rgba(124, 156, 255, 0.4), rgba(167, 139, 250, 0.4));
+  filter: brightness(1.15);
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(124, 156, 255, 0.25);
+  box-shadow: 0 8px 28px var(--accent-glow);
 }
 
 /* ─── Footer ───────────────────────────────────────────────────── */
@@ -636,11 +870,13 @@ footer {
   color: var(--text-muted);
   position: relative;
   z-index: 1;
+  transition: border-color 0.45s ease, color 0.45s ease;
 }
 
 footer a {
   color: var(--accent);
   text-decoration: none;
+  transition: color 0.45s ease;
 }
 
 /* ─── Scroll reveal ────────────────────────────────────────────── */
@@ -657,16 +893,16 @@ footer a {
 
 /* ─── Responsive ───────────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .hero-content { grid-template-columns: 1fr; }
-  .hero-card { order: -1; }
-  .about-grid { grid-template-columns: 1fr; }
-  .skills-section { grid-column: auto; }
-  .form-row { grid-template-columns: 1fr; }
-  .contact-card { padding: 32px; }
-  .nav-links { gap: 20px; }
+  .hero-content    { grid-template-columns: 1fr; }
+  .hero-card       { order: -1; }
+  .about-grid      { grid-template-columns: 1fr; }
+  .skills-section  { grid-column: auto; }
+  .form-row        { grid-template-columns: 1fr; }
+  .contact-card    { padding: 32px; }
+  .nav-links       { gap: 20px; }
 }
 
 @media (max-width: 580px) {
-  section { padding: 72px 0; }
-  .nav-links { display: none; }
+  section     { padding: 72px 0; }
+  .nav-links  { display: none; }
 }

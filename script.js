@@ -1,3 +1,22 @@
+// ─── Theme toggle ──────────────────────────────────────────────
+const html = document.documentElement;
+const themeToggle = document.getElementById('themeToggle');
+
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+const savedTheme  = localStorage.getItem('theme') ?? (prefersDark ? 'dark' : 'light');
+html.dataset.theme = savedTheme;
+
+themeToggle.addEventListener('click', () => {
+  html.classList.add('theme-transitioning');
+
+  const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  html.dataset.theme = next;
+  localStorage.setItem('theme', next);
+  themeToggle.setAttribute('aria-label', `Switch to ${next === 'dark' ? 'light' : 'dark'} theme`);
+
+  setTimeout(() => html.classList.remove('theme-transitioning'), 700);
+});
+
 // ─── Nav scroll effect ─────────────────────────────────────────
 const nav = document.querySelector('nav');
 window.addEventListener('scroll', () => {
