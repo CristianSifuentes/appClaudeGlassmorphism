@@ -1,7 +1,7 @@
 # Glassmorphism Portfolio
 ### *A surface made of frozen light.*
 
-A single-page personal portfolio built with pure HTML, CSS, and JavaScript. No frameworks, no build step, no dependencies. Open `index.html` and it breathes.
+A single-page personal portfolio built with HTML, CSS, and vanilla JavaScript. No framework, no build step. One CDN dependency — GSAP for staggered scroll transitions, loaded as a plain `<script>` tag with a graceful inline fallback if it fails. Open `index.html` and it breathes.
 
 The design speaks two languages: a **cold monochrome night** for those who work in silence, and a **warm fog** for those who feel the weight of afternoon light. Between them, a crossfade — a held breath — not a snap.
 
@@ -62,6 +62,7 @@ In light mode the glass warms: higher opacity, amber tint, sepia shadow. The sam
 | ✓ | **Magnetic cursor** | Custom dot + trailing glow. Quadratic gravitational pull toward glass cards. `mix-blend-mode: screen` in dark mode; normalises in light. Silent on touch devices. |
 | ✓ | **Typed headline** | Hero h1 cycles through five roles. Recursive `setTimeout`, variable character timing, 2800ms held pause per word. 2px blinking cursor. `prefers-reduced-motion` safe. |
 | ✓ | **Project detail modals** | Click a card; the world blurs into a glass overlay. Backdrop `backdrop-filter` transitions from `blur(0)` to `blur(20px)`. Panel enters at `scale(0.94)` and rises. Escape / outside-click closes. Focus trapped, scroll locked. |
+| ✓ | **Staggered section transitions** | GSAP + ScrollTrigger. Hero fades in on load. Every section below the fold staggers its children at 80ms intervals, `power3.out`. `clearProps: 'transform'` hands control back to card-tilt. CDN-fail and `prefers-reduced-motion` safe. |
 | ✓ | **Glassmorphism card system** | `.glass` utility — backdrop blur, translucent fill, luminous border, soft shadow |
 | ✓ | **Floating hero card** | Sine-wave float animation with subtle 3-axis mouse tilt |
 | ✓ | **Scroll reveal** | `IntersectionObserver` — elements rise as they enter the viewport |
@@ -150,6 +151,37 @@ themeToggle.addEventListener('click', () => {
   localStorage.setItem('theme', next);
   setTimeout(() => html.classList.remove('theme-transitioning'), 700);
 });
+```
+
+---
+
+## Staggered Section Transitions — How It Works
+
+Sections do not appear. They *assemble* — each child drifting into place in sequence, as though objects are being set down with deliberate, unhurried care. The 80ms gap between each element is not a delay. It is the space between thoughts: long enough to feel, short enough that the whole still coheres.
+
+**Why GSAP.** CSS transitions — the approach that preceded this — apply to all elements simultaneously. The section enters and every child fades in at once: a crowd arriving through a door, not a procession. GSAP timelines with `stagger` give each element its own moment. The header arrives first. Then the first card. Then the next. The sequence carries meaning that simultaneity cannot.
+
+**The hero.** Above-the-fold elements (`#hero .reveal`) animate on page load, not on scroll. A 220ms page-load delay lets the browser settle before the entrance begins. The hero text fades up at `delay: 0.22s`; the glass profile card follows 180ms later — just as the typewriter begins its first letter at 1200ms. The timing is not planned to the millisecond; it is felt by iteration.
+
+**The below-fold sections.** Each section (`#about`, `#work`, `#contact`) becomes a ScrollTrigger. When its top reaches 84% of the viewport height — early enough to feel responsive, late enough that the user has clearly intended to read it — GSAP animates all `.reveal` children in sequence. Duration: 0.85s per element. Ease: `power3.out` — a cubic deceleration that spends most of its time settling rather than lifting. The element is moving slowly before you notice it moved.
+
+**`clearProps: 'transform'`** is the detail that makes the rest of the page work. GSAP owns `transform` during the entrance animation (`y: 28 → 0`). After completion, `clearProps` removes the inline `transform` style entirely — returning the property to the CSS layer where the card-tilt effect and the hero's float animation live. Without this one word, the tilt would fight GSAP's inline style and lose.
+
+**Graceful degradation.** If the GSAP CDN fails (network error, offline use), a synchronous fallback immediately reveals all `.reveal` elements inline — no user ever sees a blank portfolio. `prefers-reduced-motion: reduce` is handled at two levels: the CSS rule makes elements visible at the cascade level, and the GSAP IIFE checks the same media query and calls `gsap.set('.reveal', { clearProps: 'all' })` to remove any inline state GSAP may have already set.
+
+```js
+// The cadence: not simultaneity, but sequence
+gsap.to(items, {
+  opacity:    1,
+  y:          0,
+  duration:   0.85,      // the time of one slow breath
+  ease:       'power3.out',
+  stagger:    0.08,      // 80ms — the space between thoughts
+  clearProps: 'transform',
+});
+
+// The handoff: GSAP releases the transform, card-tilt takes over
+// Without clearProps, tilt fights the inline style and loses.
 ```
 
 ---
@@ -263,6 +295,9 @@ The light-mode accent lives in `[data-theme="light"]` and follows the same patte
 | **Pause after full word** | Word complete | 2800ms | The long breath |
 | **Pause after full erase** | Word erased | 420ms | The short breath |
 | **Cursor blink** | Idle / pause | 1060ms cycle | `ease-in-out` |
+| **Hero reveal — text** | Page load | 900ms | `power2.out`, delay 220ms |
+| **Hero reveal — card** | Page load | 900ms | `power2.out`, delay 400ms |
+| **Section child stagger** | Scroll (section top at 84vh) | 850ms per element | `power3.out`, 80ms between children |
 | **Modal backdrop fade** | Card click | 440ms | `ease` |
 | **Modal backdrop blur** | Card click | 440ms | `ease` — `blur(0)` → `blur(20px)` |
 | **Modal panel rise** | Card click | 460ms | Spring `cubic-bezier(0.34,1.26,0.64,1)` |
@@ -310,7 +345,7 @@ Ordered by emotional impact on the viewer.
 - [x] **Magnetic cursor** — dot + trailing glow, quadratic glass attraction, `mix-blend-mode: screen`, touch-safe
 - [x] **Typed headline** — recursive `setTimeout`, five roles, 2800ms held pause, 2px blinking cursor, reduced-motion safe
 - [x] **Project detail modals** — click a card; the world behind it blurs into a glass overlay
-- [ ] **Staggered section transitions** — sections drift in with GSAP timelines, each child delayed by 80ms
+- [x] **Staggered section transitions** — sections drift in with GSAP timelines, each child delayed by 80ms
 - [ ] **Real contact backend** — wire the form to Formspree or EmailJS; one environment variable
 - [ ] **Ambient particle field** — a slow, sparse `<canvas>` constellation behind the orbs
 - [ ] **Blog / writing section** — thoughts rendered from Markdown; the voice behind the work
