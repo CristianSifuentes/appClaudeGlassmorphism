@@ -17,6 +17,118 @@ themeToggle.addEventListener('click', () => {
   setTimeout(() => html.classList.remove('theme-transitioning'), 700);
 });
 
+// ─── Magnetic cursor ────────────────────────────────────────────
+// The moth and its light. Silent on touch screens — never intrudes.
+(function () {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+  const dot  = document.getElementById('cursorDot');
+  const glow = document.getElementById('cursorGlow');
+
+  const MAGNETIC_RADIUS   = 140;   // px  — field of attraction around each card
+  const MAGNETIC_STRENGTH = 0.32;  // 0–1 — fraction of pull at the very centre
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  let mouseX = 0, mouseY = 0;
+  let dotX   = 0, dotY   = 0; // position of the precise inner dot
+  let glowX  = 0, glowY  = 0; // position of the trailing outer glow
+  let seenFirstMove = false;
+
+  // Snapshot all glass surfaces — they become the attractors
+  const glassEls = Array.from(document.querySelectorAll('.glass'));
+
+  // ── Raw mouse tracking ──────────────────────────────────────────
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+
+    if (!seenFirstMove) {
+      // Snap both layers to the first known position — no slide from corner
+      dotX  = mouseX; dotY  = mouseY;
+      glowX = mouseX; glowY = mouseY;
+      dot.classList.add('cursor-visible');
+      glow.classList.add('cursor-visible');
+      seenFirstMove = true;
+    }
+  });
+
+  // ── Interactive elements change cursor behaviour ─────────────────
+  document.querySelectorAll('a, button, label, input, textarea').forEach((el) => {
+    el.addEventListener('mouseenter', () => {
+      dot.classList.add('is-interactive');
+      glow.classList.add('is-interactive');
+    });
+    el.addEventListener('mouseleave', () => {
+      dot.classList.remove('is-interactive');
+      glow.classList.remove('is-interactive');
+    });
+  });
+
+  // ── Click — the point concentrates into a spark ──────────────────
+  document.addEventListener('mousedown', () => {
+    dot.classList.add('is-clicking');
+    glow.classList.add('is-clicking');
+  });
+  document.addEventListener('mouseup', () => {
+    dot.classList.remove('is-clicking');
+    glow.classList.remove('is-clicking');
+  });
+
+  // ── Fade out / in at the document boundary ───────────────────────
+  document.addEventListener('mouseleave', () => {
+    dot.classList.remove('cursor-visible');
+    glow.classList.remove('cursor-visible');
+  });
+  document.addEventListener('mouseenter', () => {
+    if (seenFirstMove) {
+      dot.classList.add('cursor-visible');
+      glow.classList.add('cursor-visible');
+    }
+  });
+
+  // ── Animation loop — magnetic pull + trailing glow ───────────────
+  function tick() {
+    let targetX   = mouseX;
+    let targetY   = mouseY;
+    let nearGlass = false;
+
+    glassEls.forEach((card) => {
+      const r    = card.getBoundingClientRect();
+      const cx   = r.left + r.width  / 2;
+      const cy   = r.top  + r.height / 2;
+      const dist = Math.hypot(mouseX - cx, mouseY - cy);
+
+      if (dist < MAGNETIC_RADIUS) {
+        // Quadratic pull: gentle at the boundary, deliberate at centre.
+        // The closer the moth, the stronger the light draws it.
+        const pull = Math.pow(1 - dist / MAGNETIC_RADIUS, 2) * MAGNETIC_STRENGTH;
+        targetX   += (cx - mouseX) * pull;
+        targetY   += (cy - mouseY) * pull;
+        nearGlass  = true;
+      }
+    });
+
+    // Dot follows the magnetic target with light lag — feels tethered, alive
+    dotX = lerp(dotX, targetX, 0.50);
+    dotY = lerp(dotY, targetY, 0.50);
+
+    // Glow drifts behind the dot — slower, heavier, like light spilled on water
+    glowX = lerp(glowX, dotX, 0.07);
+    glowY = lerp(glowY, dotY, 0.07);
+
+    dot.style.left  = dotX  + 'px';
+    dot.style.top   = dotY  + 'px';
+    glow.style.left = glowX + 'px';
+    glow.style.top  = glowY + 'px';
+
+    dot.classList.toggle('is-near-glass',  nearGlass);
+    glow.classList.toggle('is-near-glass', nearGlass);
+
+    requestAnimationFrame(tick);
+  }
+  tick();
+}());
+
 // ─── Nav scroll effect ─────────────────────────────────────────
 const nav = document.querySelector('nav');
 window.addEventListener('scroll', () => {

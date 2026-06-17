@@ -64,6 +64,11 @@
   --orb-3-color: #1a4a8a;
   --orb-opacity: 0.18;
 
+  /* Cursor */
+  --cursor-color:     #7c9cff;
+  --cursor-glow-core: rgba(124, 156, 255, 0.50);
+  --cursor-glow-edge: rgba(124, 156, 255, 0);
+
   /* Geometry */
   --radius-lg: 24px;
   --radius-md: 16px;
@@ -123,6 +128,11 @@
   --orb-2-color: #b098b8;
   --orb-3-color: #8ca0b4;
   --orb-opacity: 0.32;
+
+  /* Cursor — deeper for visibility against parchment */
+  --cursor-color:     #3d5a7e;
+  --cursor-glow-core: rgba(61, 90, 126, 0.35);
+  --cursor-glow-edge: rgba(61, 90, 126, 0);
 }
 
 /* ─── Theme-switch crossfade ─────────────────────────────────────
@@ -371,6 +381,107 @@ nav.scrolled {
 
 [data-theme="light"] .toggle-icon.icon-moon { opacity: 0;  transform: scale(0.4) rotate(60deg);  }
 [data-theme="light"] .toggle-icon.icon-sun  { opacity: 1;  transform: scale(1)   rotate(0deg);   }
+
+/* ─── Custom Cursor ─────────────────────────────────────────────
+   The moth and its light. A precise dot the eye can follow,
+   trailing a soft glow that lingers like phosphene after
+   staring at a candle. Near glass, it blooms.
+   ────────────────────────────────────────────────────────────── */
+
+/* Suppress native cursor only on true pointer devices */
+@media (hover: hover) and (pointer: fine) {
+  html,
+  a, button, label, input, textarea, select { cursor: none !important; }
+}
+
+.cursor-dot,
+.cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%, -50%);
+  opacity: 0;               /* hidden until first mouse move  */
+  will-change: left, top;
+}
+
+/* ── Inner dot — the point of attention ────────────────────────── */
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--cursor-color);
+  z-index: 10001;
+  mix-blend-mode: screen;   /* haunts dark surfaces without a hard edge */
+  transition:
+    width            0.25s ease,
+    height           0.25s ease,
+    opacity          0.35s ease,
+    background-color 0.45s ease,
+    filter           0.25s ease;
+}
+
+/* screen blend vanishes on cream — switch to normal in light mode */
+[data-theme="light"] .cursor-dot {
+  mix-blend-mode: normal;
+}
+
+/* ── Outer glow — the trailing light ───────────────────────────── */
+.cursor-glow {
+  width: 52px;
+  height: 52px;
+  background: radial-gradient(
+    circle,
+    var(--cursor-glow-core) 0%,
+    var(--cursor-glow-edge) 68%
+  );
+  z-index: 10000;
+  transition:
+    width   0.55s ease,
+    height  0.55s ease,
+    opacity 0.45s ease;
+}
+
+/* ── Visible after first move ───────────────────────────────────── */
+.cursor-dot.cursor-visible  { opacity: 1;    }
+.cursor-glow.cursor-visible { opacity: 0.75; }
+
+/* ── Near a glass card — the moth finds the light ──────────────── */
+.cursor-dot.is-near-glass {
+  width: 14px;
+  height: 14px;
+  filter: brightness(1.5);
+}
+.cursor-glow.is-near-glass {
+  width: 110px;
+  height: 110px;
+  opacity: 0.50;
+}
+
+/* ── Hovering a link / button — precision contracts ────────────── */
+.cursor-dot.is-interactive {
+  width: 5px;
+  height: 5px;
+  filter: brightness(1.9);
+}
+.cursor-glow.is-interactive {
+  width: 70px;
+  height: 70px;
+  opacity: 0.40;
+}
+
+/* ── Pressing — the point concentrates into a spark ────────────── */
+.cursor-dot.is-clicking {
+  width: 4px;
+  height: 4px;
+  filter: brightness(2.6);
+}
+.cursor-glow.is-clicking {
+  width: 28px;
+  height: 28px;
+  opacity: 0.90;
+}
 
 /* ─── Hero ─────────────────────────────────────────────────────── */
 #hero {
