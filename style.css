@@ -398,6 +398,38 @@ nav.scrolled {
 [data-theme="light"] .toggle-icon.icon-moon { opacity: 0;  transform: scale(0.4) rotate(60deg);  }
 [data-theme="light"] .toggle-icon.icon-sun  { opacity: 1;  transform: scale(1)   rotate(0deg);   }
 
+/* ─── Language Toggle ───────────────────────────────────────────
+   A small glass pill — it shows the language you have not yet
+   chosen. Pressing it is the act of crossing over.             */
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 29px;
+  padding: 0 10px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition:
+    color var(--transition),
+    border-color var(--transition),
+    background var(--transition);
+}
+
+.lang-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent-dim);
+  background: var(--glass-bg-hover);
+}
+
 /* ─── Custom Cursor ─────────────────────────────────────────────
    The moth and its light. A precise dot the eye can follow,
    trailing a soft glow that lingers like phosphene after

@@ -43,10 +43,13 @@
       <a class="nav-logo" href="#hero">Cristian<span>.</span></a>
       <div class="nav-right">
         <ul class="nav-links">
-          <li><a href="#about">About</a></li>
-          <li><a href="#work">Work</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li><a href="#about" data-i18n="nav.about">About</a></li>
+          <li><a href="#work" data-i18n="nav.work">Work</a></li>
+          <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
         </ul>
+        <button class="lang-toggle" id="langToggle" aria-label="Cambiar a español">
+          <span id="langLabel">ES</span>
+        </button>
         <button class="theme-toggle" id="themeToggle" aria-label="Switch to light theme">
           <span class="toggle-thumb">
             <!-- Moon — visible in dark mode -->
@@ -80,18 +83,18 @@
 
         <!-- Left: text -->
         <div class="hero-text reveal">
-          <span class="label">Available for freelance</span>
+          <span class="label" data-i18n="hero.label">Available for freelance</span>
           <h1>
-            Hi, I'm <span class="name">Cristian Sifuentes</span> —
+            <span data-i18n="hero.greeting">Hi, I'm</span> <span class="name">Cristian Sifuentes</span> —
             <span class="typed-line"><span class="typed-text" id="typedText"></span><span class="typed-cursor" id="typedCursor" aria-hidden="true"></span></span>
           </h1>
-          <p>
+          <p data-i18n="hero.p">
             Full-stack developer and UI designer crafting clean, accessible products
             that live at the intersection of function and beauty.
           </p>
           <div class="hero-actions">
-            <a href="#work" class="btn-primary">View my work →</a>
-            <a href="#contact" class="btn-ghost">Get in touch</a>
+            <a href="#work" class="btn-primary" data-i18n="hero.cta">View my work →</a>
+            <a href="#contact" class="btn-ghost" data-i18n="hero.cta2">Get in touch</a>
           </div>
         </div>
 
@@ -101,22 +104,22 @@
             <div class="hero-card-avatar">CS</div>
             <div class="hero-card-info">
               <h3>Cristian Sifuentes</h3>
-              <p>AI Software Engineer · Remote</p>
+              <p data-i18n="hero.card.role">AI Software Engineer · Remote</p>
             </div>
           </div>
           <div class="hero-card-divider"></div>
           <div class="hero-stats">
             <div>
               <span class="stat-value">6+</span>
-              <span class="stat-label">Years exp.</span>
+              <span class="stat-label" data-i18n="hero.card.years">Years exp.</span>
             </div>
             <div>
               <span class="stat-value">42</span>
-              <span class="stat-label">Projects</span>
+              <span class="stat-label" data-i18n="hero.card.projects">Projects</span>
             </div>
             <div>
               <span class="stat-value">18</span>
-              <span class="stat-label">Clients</span>
+              <span class="stat-label" data-i18n="hero.card.clients">Clients</span>
             </div>
           </div>
           <div class="hero-card-divider"></div>
@@ -137,17 +140,17 @@
   <section id="about">
     <div class="container">
       <div class="section-header reveal">
-        <span class="section-label">About me</span>
-        <h2>Blending craft with engineering</h2>
-        <p>I care deeply about the details — from pixel-perfect layouts to clean, maintainable code.</p>
+        <span class="section-label" data-i18n="about.label">About me</span>
+        <h2 data-i18n="about.heading">Blending craft with engineering</h2>
+        <p data-i18n="about.subheading">I care deeply about the details — from pixel-perfect layouts to clean, maintainable code.</p>
       </div>
 
       <div class="about-grid">
 
         <div class="glass about-card reveal">
           <div class="about-card-icon">🎨</div>
-          <h3>Design first</h3>
-          <p>
+          <h3 data-i18n="about.c1.title">Design first</h3>
+          <p data-i18n="about.c1.body">
             Every project starts in Figma. I focus on clarity, hierarchy, and visual rhythm
             before writing a single line of code. Good design is invisible.
           </p>
@@ -155,8 +158,8 @@
 
         <div class="glass about-card reveal">
           <div class="about-card-icon">⚡</div>
-          <h3>Performance obsessed</h3>
-          <p>
+          <h3 data-i18n="about.c2.title">Performance obsessed</h3>
+          <p data-i18n="about.c2.body">
             Beautiful interfaces mean nothing if they're slow. I optimize for Core Web Vitals,
             bundle sizes, and perceptual performance from day one.
           </p>
@@ -164,8 +167,8 @@
 
         <div class="glass about-card reveal">
           <div class="about-card-icon">♿</div>
-          <h3>Accessibility built-in</h3>
-          <p>
+          <h3 data-i18n="about.c3.title">Accessibility built-in</h3>
+          <p data-i18n="about.c3.body">
             Semantic HTML, keyboard navigation, and ARIA aren't afterthoughts — they're part
             of my standard workflow on every project.
           </p>
@@ -173,8 +176,8 @@
 
         <div class="glass about-card reveal">
           <div class="about-card-icon">🤝</div>
-          <h3>Collaborative by nature</h3>
-          <p>
+          <h3 data-i18n="about.c4.title">Collaborative by nature</h3>
+          <p data-i18n="about.c4.body">
             I thrive in cross-functional teams. I'm comfortable in Figma reviews,
             engineering standups, and client calls alike.
           </p>
@@ -182,7 +185,7 @@
 
         <!-- Skills bar spanning full width -->
         <div class="glass skills-section reveal">
-          <h3>Core skills</h3>
+          <h3 data-i18n="about.skills">Core skills</h3>
           <div class="skill-item">
             <div class="skill-header"><span>UI / UX Design</span><span>92%</span></div>
             <div class="skill-bar"><div class="skill-fill" data-width="92%"></div></div>
@@ -209,9 +212,9 @@
   <section id="work">
     <div class="container">
       <div class="section-header reveal">
-        <span class="section-label">Selected work</span>
-        <h2>Projects I'm proud of</h2>
-        <p>A handful of recent projects — each one solving a real problem with clean design.</p>
+        <span class="section-label" data-i18n="work.label">Selected work</span>
+        <h2 data-i18n="work.heading">Projects I'm proud of</h2>
+        <p data-i18n="work.subheading">A handful of recent projects — each one solving a real problem with clean design.</p>
       </div>
 
       <div class="projects-grid">
@@ -230,7 +233,7 @@
             <span class="tag">Recharts</span>
             <span class="tag">Figma</span>
           </div>
-          <a href="#" class="project-link">View case study →</a>
+          <a href="#" class="project-link" data-i18n="work.cta">View case study →</a>
         </div>
 
         <div class="glass project-card reveal"
@@ -247,7 +250,7 @@
             <span class="tag">Liquid</span>
             <span class="tag">GSAP</span>
           </div>
-          <a href="#" class="project-link">View case study →</a>
+          <a href="#" class="project-link" data-i18n="work.cta">View case study →</a>
         </div>
 
         <div class="glass project-card reveal"
@@ -264,7 +267,7 @@
             <span class="tag">Expo</span>
             <span class="tag">Reanimated</span>
           </div>
-          <a href="#" class="project-link">View case study →</a>
+          <a href="#" class="project-link" data-i18n="work.cta">View case study →</a>
         </div>
 
       </div>
@@ -275,9 +278,9 @@
   <section id="writing">
     <div class="container">
       <div class="section-header reveal">
-        <span class="section-label">Writing</span>
-        <h2>Thoughts from the studio</h2>
-        <p>Notes on design, craft, and the quiet spaces between decisions.</p>
+        <span class="section-label" data-i18n="writing.label">Writing</span>
+        <h2 data-i18n="writing.heading">Thoughts from the studio</h2>
+        <p data-i18n="writing.subheading">Notes on design, craft, and the quiet spaces between decisions.</p>
       </div>
       <!-- Post cards rendered here by script.js from posts.js -->
       <div class="posts-grid" id="postsGrid"></div>
@@ -288,32 +291,32 @@
   <section id="contact">
     <div class="container">
       <div class="section-header reveal">
-        <span class="section-label">Get in touch</span>
-        <h2>Let's build something together</h2>
-        <p>Open to freelance projects, full-time roles, and interesting collaborations.</p>
+        <span class="section-label" data-i18n="contact.label">Get in touch</span>
+        <h2 data-i18n="contact.heading">Let's build something together</h2>
+        <p data-i18n="contact.subheading">Open to freelance projects, full-time roles, and interesting collaborations.</p>
       </div>
 
       <div class="glass contact-card reveal">
         <form class="contact-form" novalidate>
           <div class="form-row">
             <div class="form-group">
-              <label for="name">Name</label>
-              <input id="name" name="name" type="text" placeholder="Your name" required />
+              <label for="name" data-i18n="contact.name">Name</label>
+              <input id="name" name="name" type="text" placeholder="Your name" data-i18n-placeholder="contact.namePH" required />
             </div>
             <div class="form-group">
-              <label for="email">Email</label>
-              <input id="email" name="email" type="email" placeholder="your@email.com" required />
+              <label for="email" data-i18n="contact.email">Email</label>
+              <input id="email" name="email" type="email" placeholder="your@email.com" data-i18n-placeholder="contact.emailPH" required />
             </div>
           </div>
           <div class="form-group">
-            <label for="subject">Subject</label>
-            <input id="subject" name="subject" type="text" placeholder="What's this about?" />
+            <label for="subject" data-i18n="contact.subject">Subject</label>
+            <input id="subject" name="subject" type="text" placeholder="What's this about?" data-i18n-placeholder="contact.subjectPH" />
           </div>
           <div class="form-group">
-            <label for="message">Message</label>
-            <textarea id="message" name="message" placeholder="Tell me about your project..." required></textarea>
+            <label for="message" data-i18n="contact.message">Message</label>
+            <textarea id="message" name="message" placeholder="Tell me about your project..." data-i18n-placeholder="contact.messagePH" required></textarea>
           </div>
-          <button type="submit" class="btn-submit">Send message</button>
+          <button type="submit" class="btn-submit" data-i18n="contact.submit">Send message</button>
           <div class="form-status" id="formStatus" role="status" aria-live="polite" aria-atomic="true"></div>
         </form>
       </div>
@@ -325,7 +328,7 @@
   <footer>
     <div class="container">
       <p>
-        &copy; 2026 Cristian Sifuentes &mdash; Built with glassmorphism &amp; good taste.
+        &copy; 2026 Cristian Sifuentes &mdash; <span data-i18n="footer.tagline">Built with glassmorphism &amp; good taste.</span>
         <br />
         <a href="mailto:hello@cristiansifuentes.dev">hello@cristiansifuentes.dev</a>
       </p>
@@ -386,6 +389,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <!-- marked.js — Markdown → HTML for the writing section -->
   <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+  <!-- lang.js — all UI strings in EN and ES; add a language by adding one object -->
+  <script src="lang.js"></script>
   <!-- posts.js — writing content, editable without touching script.js -->
   <script src="posts.js"></script>
   <script src="script.js"></script>

@@ -67,6 +67,7 @@ In light mode the glass warms: higher opacity, amber tint, sepia shadow. The sam
 | ✓ | **Ambient particle field** | 55-particle `<canvas>` constellation behind the orbs. Random-walk drift at ≤ 0.28 px/frame. Independent sine-wave breathing per particle. Constellation lines at ≤ 0.5px, fading with distance. Theme-colour lerp over ~2s. DPR-aware. `prefers-reduced-motion` silent. |
 | ✓ | **Blog / writing section** | Three glass cards rendered from `posts.js`. Markdown parsed client-side via `marked.js`. Full post opens in a reading modal with literary typography — blockquotes, inline code, `<hr>` dividers, comfortable 1.85 line-height. Separate GSAP stagger for dynamically rendered cards. |
 | ✓ | **PWA support** | `manifest.json` + service worker. Cache-first for local assets, stale-while-revalidate for CDN. Pre-caches the full reading experience on first visit. Offline navigation falls back to `index.html`. Installable to home screen. Theme-aware `theme-color` meta for native status bar. |
+| ✓ | **Multilingual support** | English / Spanish. All UI strings in `lang.js` — one object per language. `data-i18n` attributes on every translatable element. Glass pill toggle in the nav. 160ms opacity-fade crossfade on switch. `localStorage` persistence. Browser language auto-detection on first load. Typewriter roles and form reset text update live. |
 | ✓ | **Glassmorphism card system** | `.glass` utility — backdrop blur, translucent fill, luminous border, soft shadow |
 | ✓ | **Floating hero card** | Sine-wave float animation with subtle 3-axis mouse tilt |
 | ✓ | **Scroll reveal** | `IntersectionObserver` — elements rise as they enter the viewport |
@@ -329,6 +330,48 @@ backdrop.addEventListener('transitionend', () => {
 
 ---
 
+## Multilingual Support — How It Works
+
+A portfolio speaks one language. But a person holds more than one inside them.
+
+The toggle is a small glass pill in the navigation — not labelled with the current language, but with the other one. It shows you the self you have not yet chosen. Pressing it is the act of crossing over. The visible text dims, holds — a breath held for 160 milliseconds — and then returns in Spanish. Or in English. The glass is the same. The light is the same. Only the words change, and yet the feeling of the portfolio shifts entirely: a second register, a second voice, the same work seen from a different angle of the self.
+
+**The translation object.** All UI strings live in `lang.js` — a single `LANG` constant with an object for each language code. Every string is namespaced: `LANG.es.about.c1.title`, `LANG.en.hero.greeting`. Adding a new language means adding one object to `LANG` with the same key structure. No other file needs to change.
+
+**The `data-i18n` system.** Every translatable element in `index.html` carries a `data-i18n="dot.path.key"` attribute. Form inputs carry `data-i18n-placeholder="dot.path.key"` for their placeholder text. On language switch, the IIFE queries all `[data-i18n]` elements and sets `textContent` from the resolved path — a depth-first walk down the language object with a simple `reduce`. If a key does not resolve, the element is left unchanged.
+
+**The crossfade.** When the toggle fires, all `[data-i18n]` elements receive inline `transition: opacity 0.16s ease` and `opacity: 0`. After 160ms — the fade completes — the text swaps and `opacity: 1` triggers the return. After another 220ms, the inline styles are removed so no element's permanent transitions are altered. The whole animation is 380ms of borrowed style, leaving nothing behind.
+
+**The typewriter.** The hero headline types through five roles that describe the same person in five different ways. In Spanish, those roles are different sentences — different textures, different lengths. The language switcher calls `window.__setTypewriterLang(roles)` — exposed by the typewriter IIFE — passing the new roles array. The currently-typing word is not interrupted: it finishes its erasure, and the next word that begins is already in the new language. A natural transition: the old voice speaks its last word, the new voice takes the next breath.
+
+**Persistence and detection.** Language preference is saved to `localStorage` under the key `'lang'`. On first visit, if no preference is saved, the IIFE reads `navigator.language`, extracts the two-character code, and checks whether `LANG` has a matching entry. Spanish browsers open in Spanish. All others open in English. The preference persists across sessions, offline reads, and home-screen launches.
+
+**The form.** When the contact form is submitted, the button enters temporary states — "Sending…", "Message received ✓" — in English regardless of the current language. These are transient: the reader sees them for five seconds or less. When the form resets, the button returns to `LANG[currentLang].contact.submit` — the correct language — so it is always in the right tongue after the moment passes.
+
+**Adding a third language.** Open `lang.js`. Copy the `en` block. Rename it `fr` (or `de`, or any two-character code). Translate the strings. The detection logic, the fade mechanism, the typewriter update, the form reset — none of them need to know. They read from whatever `LANG[code]` contains.
+
+```js
+// The resolution — a dot path walks the object
+function resolve(obj, path) {
+  return path.split('.').reduce((o, k) => o && o[k] !== undefined ? o[k] : null, obj);
+}
+
+// The crossfade — borrowed opacity, returned after the swap
+targets.forEach((el) => { el.style.transition = 'opacity 0.16s ease'; el.style.opacity = '0'; });
+setTimeout(() => {
+  swap(code);                                        // words change
+  targets.forEach((el) => { el.style.opacity = '1'; }); // words return
+  setTimeout(() => targets.forEach((el) => {         // inline styles released
+    el.style.transition = ''; el.style.opacity = '';
+  }), 220);
+}, 160);
+
+// The typewriter — old voice finishes, new voice begins
+window.__setTypewriterLang = function (newRoles) { roles = newRoles; };
+```
+
+---
+
 ## PWA Support — How It Works
 
 The portfolio remembers itself.
@@ -400,6 +443,7 @@ glassmorphism-portfolio/
 ├── style.css      design token system, glass utility, both themes, markdown typography
 ├── script.js      magnetic cursor, typed headline, theme toggle, particles, modals, blog
 ├── posts.js       writing content — add new entries here, Markdown rendered at runtime
+├── lang.js        all UI strings in EN and ES — add a language by adding one object
 ├── manifest.json  PWA manifest — app identity, icons, theme colour, display mode
 ├── sw.js          service worker — cache-first strategy, offline reading
 ├── icon.svg       app icon — CS monogram on dark glass, used for home-screen install
@@ -525,7 +569,7 @@ Ordered by emotional impact on the viewer.
 - [x] **Ambient particle field** — a slow, sparse `<canvas>` constellation behind the orbs
 - [x] **Blog / writing section** — thoughts rendered from Markdown; the voice behind the work
 - [x] **PWA support** — `manifest.json` and a service worker for offline reading
-- [ ] **Multilingual support** — a second language, a second self
+- [x] **Multilingual support** — a second language, a second self
 - [ ] **Image optimisation** — WebP with `srcset`, native lazy loading
 
 ---
