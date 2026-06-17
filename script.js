@@ -543,6 +543,129 @@ window.addEventListener('scroll', () => {
   }
 }());
 
+// ─── Writing / Blog section ─────────────────────────────────────
+// Three glass cards, each a sealed letter. The first sentence is
+// visible. The rest waits behind the glass, patient. Click: the
+// world softens, the post opens. Read. Close. The world returns.
+(function () {
+  const grid      = document.getElementById('postsGrid');
+  const backdrop  = document.getElementById('postBackdrop');
+  const closeBtn  = document.getElementById('postClose');
+  const postMeta  = document.getElementById('postMeta');
+  const postTitle = document.getElementById('postTitle');
+  const postBody  = document.getElementById('postBody');
+
+  if (!grid || !backdrop || typeof POSTS === 'undefined') return;
+
+  // ── Render post cards from the POSTS data array ──────────────────
+  POSTS.forEach((post) => {
+    const dateStr = new Date(post.date).toLocaleDateString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric',
+    });
+
+    const card = document.createElement('div');
+    card.className = 'glass post-card reveal';
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-haspopup', 'dialog');
+    card.innerHTML = `
+      <div class="post-card-date">${dateStr} &middot; ${post.readTime}</div>
+      <h3 class="post-card-title">${post.title}</h3>
+      <p class="post-card-excerpt">${post.excerpt}</p>
+      <span class="post-card-cta" aria-hidden="true">Read &rarr;</span>
+    `;
+
+    card.addEventListener('click', () => open(post));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(post); }
+    });
+
+    grid.appendChild(card);
+  });
+
+  // Register rendered cards with GSAP scroll reveal (they come in
+  // after the main stagger IIFE has already run, so get their own trigger)
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    const cards = Array.from(grid.querySelectorAll('.post-card'));
+    gsap.set(cards, { opacity: 0, y: 28 });
+    ScrollTrigger.create({
+      trigger: '#writing',
+      start:   'top 84%',
+      once:    true,
+      onEnter() {
+        gsap.to(cards, {
+          opacity:    1,
+          y:          0,
+          duration:   0.85,
+          ease:       'power3.out',
+          stagger:    0.08,
+          delay:      0.08, // let the section header lead by one step
+          clearProps: 'transform',
+        });
+      },
+    });
+  } else {
+    // GSAP unavailable — show cards immediately
+    grid.querySelectorAll('.post-card').forEach((c) => {
+      c.style.opacity   = '1';
+      c.style.transform = 'none';
+    });
+  }
+
+  // ── Post reader — open ───────────────────────────────────────────
+  let lastFocused = null;
+
+  function open(post) {
+    const dateStr = new Date(post.date).toLocaleDateString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric',
+    });
+
+    postMeta.textContent  = `${dateStr} · ${post.readTime} read`;
+    postTitle.textContent = post.title;
+
+    // Render Markdown — marked.js produces clean, semantic HTML
+    if (typeof marked !== 'undefined') {
+      postBody.innerHTML = marked.parse(post.content.trim());
+    } else {
+      // Fallback: plain paragraphs split on double newline
+      postBody.innerHTML = post.content.trim()
+        .split(/\n\n+/)
+        .map((p) => `<p>${p.replace(/\n/g, ' ').trim()}</p>`)
+        .join('');
+    }
+
+    const sw = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.paddingRight = sw + 'px';
+    document.body.style.overflow     = 'hidden';
+
+    lastFocused = document.activeElement;
+    backdrop.removeAttribute('aria-hidden');
+    backdrop.classList.add('is-open');
+    // Scroll the reader back to top for each new post
+    backdrop.querySelector('.modal-scroll').scrollTop = 0;
+    setTimeout(() => closeBtn.focus(), 50);
+  }
+
+  // ── Post reader — close ──────────────────────────────────────────
+  function close() {
+    backdrop.classList.remove('is-open');
+    document.body.style.overflow     = '';
+    document.body.style.paddingRight = '';
+    if (lastFocused) lastFocused.focus();
+    backdrop.addEventListener(
+      'transitionend',
+      () => backdrop.setAttribute('aria-hidden', 'true'),
+      { once: true }
+    );
+  }
+
+  closeBtn.addEventListener('click', close);
+  backdrop.addEventListener('click', (e) => { if (e.target === backdrop) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && backdrop.classList.contains('is-open')) close();
+  });
+}());
+
 // ─── Skill bars ─────────────────────────────────────────────────
 const skillObserver = new IntersectionObserver(
   (entries) => {
