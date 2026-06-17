@@ -413,9 +413,9 @@ window.addEventListener('scroll', () => {
   const LINE_OPA = 0.13;  // max line opacity — a whisper, not a voice
 
   // ── Per-theme accent colours ──────────────────────────────────────
-  // Dark: #7c9cff cold periwinkle   Light: #5d7a9e dusty slate
-  const DARK_COL  = { r: 124, g: 156, b: 255 };
-  const LIGHT_COL = { r:  93, g: 122, b: 158 };
+  // Dark: #c8c8c8 silver-gray   Light: #505050 charcoal-gray
+  const DARK_COL  = { r: 190, g: 190, b: 190 };
+  const LIGHT_COL = { r:  80, g:  80, b:  80 };
 
   const lerp = (a, b, t) => a + (b - a) * t;
 
