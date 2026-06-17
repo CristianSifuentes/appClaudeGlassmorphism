@@ -8,6 +8,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <!-- No-JS: reveal project images immediately if the reveal IIFE cannot run -->
+  <noscript><style>.project-thumb__img { opacity: 1 !important; }</style></noscript>
+  <!-- PWA manifest & theme -->
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#ede8df" media="(prefers-color-scheme: light)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="CS Portfolio" />
+  <link rel="apple-touch-icon" href="./icon.svg" />
 </head>
 <body>
 
@@ -35,10 +45,13 @@
       <a class="nav-logo" href="#hero">Cristian<span>.</span></a>
       <div class="nav-right">
         <ul class="nav-links">
-          <li><a href="#about">About</a></li>
-          <li><a href="#work">Work</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li><a href="#about" data-i18n="nav.about">About</a></li>
+          <li><a href="#work" data-i18n="nav.work">Work</a></li>
+          <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
         </ul>
+        <button class="lang-toggle" id="langToggle" aria-label="Cambiar a español">
+          <span id="langLabel">ES</span>
+        </button>
         <button class="theme-toggle" id="themeToggle" aria-label="Switch to light theme">
           <span class="toggle-thumb">
             <!-- Moon — visible in dark mode -->
@@ -72,18 +85,18 @@
 
         <!-- Left: text -->
         <div class="hero-text reveal">
-          <span class="label">Available for freelance</span>
+          <span class="label" data-i18n="hero.label">Available for freelance</span>
           <h1>
-            Hi, I'm <span class="name">Cristian Sifuentes</span> —
+            <span data-i18n="hero.greeting">Hi, I'm</span> <span class="name">Cristian Sifuentes</span> —
             <span class="typed-line"><span class="typed-text" id="typedText"></span><span class="typed-cursor" id="typedCursor" aria-hidden="true"></span></span>
           </h1>
-          <p>
+          <p data-i18n="hero.p">
             Full-stack developer and UI designer crafting clean, accessible products
             that live at the intersection of function and beauty.
           </p>
           <div class="hero-actions">
-            <a href="#work" class="btn-primary">View my work →</a>
-            <a href="#contact" class="btn-ghost">Get in touch</a>
+            <a href="#work" class="btn-primary" data-i18n="hero.cta">View my work →</a>
+            <a href="#contact" class="btn-ghost" data-i18n="hero.cta2">Get in touch</a>
           </div>
         </div>
 
@@ -93,22 +106,22 @@
             <div class="hero-card-avatar">CS</div>
             <div class="hero-card-info">
               <h3>Cristian Sifuentes</h3>
-              <p>AI Software Engineer · Remote</p>
+              <p data-i18n="hero.card.role">AI Software Engineer · Remote</p>
             </div>
           </div>
           <div class="hero-card-divider"></div>
           <div class="hero-stats">
             <div>
               <span class="stat-value">6+</span>
-              <span class="stat-label">Years exp.</span>
+              <span class="stat-label" data-i18n="hero.card.years">Years exp.</span>
             </div>
             <div>
               <span class="stat-value">42</span>
-              <span class="stat-label">Projects</span>
+              <span class="stat-label" data-i18n="hero.card.projects">Projects</span>
             </div>
             <div>
               <span class="stat-value">18</span>
-              <span class="stat-label">Clients</span>
+              <span class="stat-label" data-i18n="hero.card.clients">Clients</span>
             </div>
           </div>
           <div class="hero-card-divider"></div>
@@ -129,17 +142,17 @@
   <section id="about">
     <div class="container">
       <div class="section-header reveal">
-        <span class="section-label">About me</span>
-        <h2>Blending craft with engineering</h2>
-        <p>I care deeply about the details — from pixel-perfect layouts to clean, maintainable code.</p>
+        <span class="section-label" data-i18n="about.label">About me</span>
+        <h2 data-i18n="about.heading">Blending craft with engineering</h2>
+        <p data-i18n="about.subheading">I care deeply about the details — from pixel-perfect layouts to clean, maintainable code.</p>
       </div>
 
       <div class="about-grid">
 
         <div class="glass about-card reveal">
           <div class="about-card-icon">🎨</div>
-          <h3>Design first</h3>
-          <p>
+          <h3 data-i18n="about.c1.title">Design first</h3>
+          <p data-i18n="about.c1.body">
             Every project starts in Figma. I focus on clarity, hierarchy, and visual rhythm
             before writing a single line of code. Good design is invisible.
           </p>
@@ -147,8 +160,8 @@
 
         <div class="glass about-card reveal">
           <div class="about-card-icon">⚡</div>
-          <h3>Performance obsessed</h3>
-          <p>
+          <h3 data-i18n="about.c2.title">Performance obsessed</h3>
+          <p data-i18n="about.c2.body">
             Beautiful interfaces mean nothing if they're slow. I optimize for Core Web Vitals,
             bundle sizes, and perceptual performance from day one.
           </p>
@@ -156,8 +169,8 @@
 
         <div class="glass about-card reveal">
           <div class="about-card-icon">♿</div>
-          <h3>Accessibility built-in</h3>
-          <p>
+          <h3 data-i18n="about.c3.title">Accessibility built-in</h3>
+          <p data-i18n="about.c3.body">
             Semantic HTML, keyboard navigation, and ARIA aren't afterthoughts — they're part
             of my standard workflow on every project.
           </p>
@@ -165,8 +178,8 @@
 
         <div class="glass about-card reveal">
           <div class="about-card-icon">🤝</div>
-          <h3>Collaborative by nature</h3>
-          <p>
+          <h3 data-i18n="about.c4.title">Collaborative by nature</h3>
+          <p data-i18n="about.c4.body">
             I thrive in cross-functional teams. I'm comfortable in Figma reviews,
             engineering standups, and client calls alike.
           </p>
@@ -174,7 +187,7 @@
 
         <!-- Skills bar spanning full width -->
         <div class="glass skills-section reveal">
-          <h3>Core skills</h3>
+          <h3 data-i18n="about.skills">Core skills</h3>
           <div class="skill-item">
             <div class="skill-header"><span>UI / UX Design</span><span>92%</span></div>
             <div class="skill-bar"><div class="skill-fill" data-width="92%"></div></div>
@@ -201,9 +214,9 @@
   <section id="work">
     <div class="container">
       <div class="section-header reveal">
-        <span class="section-label">Selected work</span>
-        <h2>Projects I'm proud of</h2>
-        <p>A handful of recent projects — each one solving a real problem with clean design.</p>
+        <span class="section-label" data-i18n="work.label">Selected work</span>
+        <h2 data-i18n="work.heading">Projects I'm proud of</h2>
+        <p data-i18n="work.subheading">A handful of recent projects — each one solving a real problem with clean design.</p>
       </div>
 
       <div class="projects-grid">
@@ -211,7 +224,21 @@
         <div class="glass project-card reveal"
              role="button" tabindex="0" aria-haspopup="dialog"
              data-detail="A complete design-to-code engagement for a B2B analytics platform serving data teams across three continents. The work spanned a component library of 48 elements, a real-time chart engine hand-built without third-party dependencies, and a dark mode careful enough to account for the eye's slower adaptation to blue light at night. The goal: a dashboard that analysts could look at for eight hours without fatigue — calm under pressure, honest with complexity.">
-          <div class="project-image">📊</div>
+          <figure class="project-thumb">
+            <picture class="project-thumb__picture">
+              <source type="image/webp"
+                      srcset="images/luminary-400.webp 400w,
+                              images/luminary-800.webp 800w"
+                      sizes="(max-width: 900px) 100vw, 45vw" />
+              <img src="images/luminary.jpg"
+                   alt=""
+                   width="800" height="450"
+                   loading="lazy"
+                   decoding="async"
+                   class="project-thumb__img img-reveal" />
+            </picture>
+            <div class="project-image" aria-hidden="true">📊</div>
+          </figure>
           <h3>Luminary — Analytics Dashboard</h3>
           <p>
             End-to-end design and frontend build for a B2B SaaS analytics platform.
@@ -222,13 +249,27 @@
             <span class="tag">Recharts</span>
             <span class="tag">Figma</span>
           </div>
-          <a href="#" class="project-link">View case study →</a>
+          <a href="#" class="project-link" data-i18n="work.cta">View case study →</a>
         </div>
 
         <div class="glass project-card reveal"
              role="button" tabindex="0" aria-haspopup="dialog"
              data-detail="A full UX audit and storefront redesign for a direct-to-consumer sustainable brand. The work began with session recordings and scroll heatmaps — watching strangers navigate the old site, noticing where they hesitated, where they left. Three friction points in the checkout flow accounted for most of the abandonment. The redesign was quiet rather than flashy: clearer hierarchy, less noise, a checkout that asked fewer questions. Conversion improved 34% in the first four weeks.">
-          <div class="project-image">🌿</div>
+          <figure class="project-thumb">
+            <picture class="project-thumb__picture">
+              <source type="image/webp"
+                      srcset="images/verdant-400.webp 400w,
+                              images/verdant-800.webp 800w"
+                      sizes="(max-width: 900px) 100vw, 45vw" />
+              <img src="images/verdant.jpg"
+                   alt=""
+                   width="800" height="450"
+                   loading="lazy"
+                   decoding="async"
+                   class="project-thumb__img img-reveal" />
+            </picture>
+            <div class="project-image" aria-hidden="true">🌿</div>
+          </figure>
           <h3>Verdant — E-commerce Store</h3>
           <p>
             Shopify storefront redesign for a sustainable lifestyle brand. Improved
@@ -239,13 +280,27 @@
             <span class="tag">Liquid</span>
             <span class="tag">GSAP</span>
           </div>
-          <a href="#" class="project-link">View case study →</a>
+          <a href="#" class="project-link" data-i18n="work.cta">View case study →</a>
         </div>
 
         <div class="glass project-card reveal"
              role="button" tabindex="0" aria-haspopup="dialog"
              data-detail="A cross-platform fitness application built for a personal training startup launching simultaneously on iOS and Android. The custom animation system replaced default spring physics with hand-tuned curves — motion that feels like the body moving, not a UI sliding. Offline support was non-negotiable: users train in basements, in garages, in places with no signal. The app had to hold what it knew and work with whatever was there.">
-          <div class="project-image">📱</div>
+          <figure class="project-thumb">
+            <picture class="project-thumb__picture">
+              <source type="image/webp"
+                      srcset="images/pulse-400.webp 400w,
+                              images/pulse-800.webp 800w"
+                      sizes="(max-width: 900px) 100vw, 45vw" />
+              <img src="images/pulse.jpg"
+                   alt=""
+                   width="800" height="450"
+                   loading="lazy"
+                   decoding="async"
+                   class="project-thumb__img img-reveal" />
+            </picture>
+            <div class="project-image" aria-hidden="true">📱</div>
+          </figure>
           <h3>Pulse — Fitness Mobile App</h3>
           <p>
             React Native app for a personal training startup. Custom animation system,
@@ -256,7 +311,7 @@
             <span class="tag">Expo</span>
             <span class="tag">Reanimated</span>
           </div>
-          <a href="#" class="project-link">View case study →</a>
+          <a href="#" class="project-link" data-i18n="work.cta">View case study →</a>
         </div>
 
       </div>
@@ -267,9 +322,9 @@
   <section id="writing">
     <div class="container">
       <div class="section-header reveal">
-        <span class="section-label">Writing</span>
-        <h2>Thoughts from the studio</h2>
-        <p>Notes on design, craft, and the quiet spaces between decisions.</p>
+        <span class="section-label" data-i18n="writing.label">Writing</span>
+        <h2 data-i18n="writing.heading">Thoughts from the studio</h2>
+        <p data-i18n="writing.subheading">Notes on design, craft, and the quiet spaces between decisions.</p>
       </div>
       <!-- Post cards rendered here by script.js from posts.js -->
       <div class="posts-grid" id="postsGrid"></div>
@@ -280,32 +335,32 @@
   <section id="contact">
     <div class="container">
       <div class="section-header reveal">
-        <span class="section-label">Get in touch</span>
-        <h2>Let's build something together</h2>
-        <p>Open to freelance projects, full-time roles, and interesting collaborations.</p>
+        <span class="section-label" data-i18n="contact.label">Get in touch</span>
+        <h2 data-i18n="contact.heading">Let's build something together</h2>
+        <p data-i18n="contact.subheading">Open to freelance projects, full-time roles, and interesting collaborations.</p>
       </div>
 
       <div class="glass contact-card reveal">
         <form class="contact-form" novalidate>
           <div class="form-row">
             <div class="form-group">
-              <label for="name">Name</label>
-              <input id="name" name="name" type="text" placeholder="Your name" required />
+              <label for="name" data-i18n="contact.name">Name</label>
+              <input id="name" name="name" type="text" placeholder="Your name" data-i18n-placeholder="contact.namePH" required />
             </div>
             <div class="form-group">
-              <label for="email">Email</label>
-              <input id="email" name="email" type="email" placeholder="your@email.com" required />
+              <label for="email" data-i18n="contact.email">Email</label>
+              <input id="email" name="email" type="email" placeholder="your@email.com" data-i18n-placeholder="contact.emailPH" required />
             </div>
           </div>
           <div class="form-group">
-            <label for="subject">Subject</label>
-            <input id="subject" name="subject" type="text" placeholder="What's this about?" />
+            <label for="subject" data-i18n="contact.subject">Subject</label>
+            <input id="subject" name="subject" type="text" placeholder="What's this about?" data-i18n-placeholder="contact.subjectPH" />
           </div>
           <div class="form-group">
-            <label for="message">Message</label>
-            <textarea id="message" name="message" placeholder="Tell me about your project..." required></textarea>
+            <label for="message" data-i18n="contact.message">Message</label>
+            <textarea id="message" name="message" placeholder="Tell me about your project..." data-i18n-placeholder="contact.messagePH" required></textarea>
           </div>
-          <button type="submit" class="btn-submit">Send message</button>
+          <button type="submit" class="btn-submit" data-i18n="contact.submit">Send message</button>
           <div class="form-status" id="formStatus" role="status" aria-live="polite" aria-atomic="true"></div>
         </form>
       </div>
@@ -317,7 +372,7 @@
   <footer>
     <div class="container">
       <p>
-        &copy; 2026 Cristian Sifuentes &mdash; Built with glassmorphism &amp; good taste.
+        &copy; 2026 Cristian Sifuentes &mdash; <span data-i18n="footer.tagline">Built with glassmorphism &amp; good taste.</span>
         <br />
         <a href="mailto:hello@cristiansifuentes.dev">hello@cristiansifuentes.dev</a>
       </p>
@@ -378,8 +433,18 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <!-- marked.js — Markdown → HTML for the writing section -->
   <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+  <!-- lang.js — all UI strings in EN and ES; add a language by adding one object -->
+  <script src="lang.js"></script>
   <!-- posts.js — writing content, editable without touching script.js -->
   <script src="posts.js"></script>
   <script src="script.js"></script>
+  <!-- PWA — service worker for offline reading -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>

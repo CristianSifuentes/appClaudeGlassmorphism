@@ -154,13 +154,17 @@ themeToggle.addEventListener('click', () => {
   }
 
   // Five roles — each one a true, slightly different answer
-  const roles = [
+  // (let so the language switcher can replace this array mid-cycle)
+  let roles = [
     'a design engineer.',
     'a frontend sculptor.',
     'a builder of careful things.',
     'a visual architect.',
     'a pixel poet.',
   ];
+
+  // Language switcher calls this; the new roles take effect on the next erase cycle
+  window.__setTypewriterLang = function (newRoles) { roles = newRoles; };
 
   const TYPE_MIN    =  55;  // ms — minimum time between typed characters
   const TYPE_MAX    =  95;  // ms — maximum time (randomness = humanity)
@@ -572,7 +576,7 @@ window.addEventListener('scroll', () => {
       <div class="post-card-date">${dateStr} &middot; ${post.readTime}</div>
       <h3 class="post-card-title">${post.title}</h3>
       <p class="post-card-excerpt">${post.excerpt}</p>
-      <span class="post-card-cta" aria-hidden="true">Read &rarr;</span>
+      <span class="post-card-cta" aria-hidden="true" data-i18n="writing.read">Read &rarr;</span>
     `;
 
     card.addEventListener('click', () => open(post));
@@ -736,7 +740,9 @@ document.querySelectorAll('.glass').forEach((card) => {
   }
 
   function reset(btn, stateClass) {
-    btn.textContent = 'Send message';
+    const dict = (window.__currentLang && typeof LANG !== 'undefined' && LANG[window.__currentLang])
+      ? LANG[window.__currentLang] : null;
+    btn.textContent = dict ? dict.contact.submit : 'Send message';
     btn.classList.remove(stateClass);
     btn.disabled = false;
     hideStatus();
@@ -791,4 +797,135 @@ document.querySelectorAll('.glass').forEach((card) => {
       setTimeout(() => reset(btn, 'is-error'), 6000);
     }
   });
+}());
+
+// ─── Image optimisation — lazy reveal ───────────────────────────
+// The emoji holds the frame until the photograph arrives.
+// When the browser delivers the image, it does not snap into place —
+// it surfaces slowly, opacity rising over 650ms, like a print
+// emerging in developer. The emoji yields in parallel, unhurried.
+(function () {
+  const imgs = Array.from(document.querySelectorAll('.img-reveal'));
+  if (!imgs.length) return;
+
+  function reveal(img) {
+    img.classList.add('is-loaded');
+    const thumb = img.closest('.project-thumb');
+    if (thumb) thumb.classList.add('has-image');
+  }
+
+  imgs.forEach(function (img) {
+    // Images already in the cache may be complete before this script runs
+    if (img.complete) {
+      if (img.naturalWidth > 0) reveal(img); // cached and loaded
+      // naturalWidth === 0 means the fetch failed — emoji fallback stays
+      return;
+    }
+    img.addEventListener('load',  function () { reveal(img); }, { once: true });
+    // No error handler needed: on 404 the fallback emoji is already visible
+  });
+}());
+
+// ─── Multilingual support ────────────────────────────────────────
+// Two tongues. One self. The button shows the language you have
+// not yet chosen — pressing it is the act of crossing over.
+// Text fades, the world shifts, the portfolio speaks again.
+(function () {
+  if (typeof LANG === 'undefined') return;
+
+  const toggle = document.getElementById('langToggle');
+  const label  = document.getElementById('langLabel');
+  const htmlEl = document.documentElement;
+
+  // Resolve a dot-path key inside a language object
+  // e.g. resolve(LANG.es, 'about.c1.title') → 'Diseño primero'
+  function resolve(obj, path) {
+    return path.split('.').reduce(function (o, k) {
+      return o && o[k] !== undefined ? o[k] : null;
+    }, obj);
+  }
+
+  // Detect the preferred language on first load
+  function detect() {
+    const saved = localStorage.getItem('lang');
+    if (saved && LANG[saved]) return saved;
+    const browser = ((navigator.language || navigator.userLanguage || 'en').slice(0, 2)).toLowerCase();
+    return LANG[browser] ? browser : 'en';
+  }
+
+  // Write translations into every data-i18n / data-i18n-placeholder element
+  function swap(code) {
+    const dict = LANG[code];
+    if (!dict) return;
+
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      const text = resolve(dict, el.dataset.i18n);
+      if (text !== null) el.textContent = text;
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
+      const text = resolve(dict, el.dataset.i18nPlaceholder);
+      if (text !== null) el.placeholder = text;
+    });
+
+    // Update the html[lang] attribute for accessibility and SEO
+    htmlEl.lang = code;
+
+    // Hand new roles to the typewriter — it picks them up on the next cycle
+    if (typeof window.__setTypewriterLang === 'function') {
+      window.__setTypewriterLang(dict.hero.roles);
+    }
+
+    // Toggle label shows the OTHER language (the one you can become)
+    const other = code === 'en' ? 'ES' : 'EN';
+    if (label) label.textContent = other;
+    if (toggle) {
+      toggle.setAttribute('aria-label', other === 'ES' ? 'Cambiar a español' : 'Switch to English');
+    }
+
+    // Expose current language for other modules (form reset, etc.)
+    window.__currentLang = code;
+    localStorage.setItem('lang', code);
+  }
+
+  // Animated switch: translatable text dims, swaps, then returns
+  function applyLang(code, animate) {
+    if (!animate) {
+      swap(code);
+      return;
+    }
+
+    const targets = Array.from(document.querySelectorAll('[data-i18n]'));
+
+    // Fade out — a held breath
+    targets.forEach(function (el) {
+      el.style.transition = 'opacity 0.16s ease';
+      el.style.opacity    = '0';
+    });
+
+    setTimeout(function () {
+      swap(code);
+
+      // Fade in — the new voice arrives
+      targets.forEach(function (el) { el.style.opacity = '1'; });
+
+      // Release inline styles; do not permanently alter each element's transitions
+      setTimeout(function () {
+        targets.forEach(function (el) {
+          el.style.transition = '';
+          el.style.opacity    = '';
+        });
+      }, 220);
+    }, 160);
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────
+  applyLang(detect(), false);
+
+  // ── Toggle ───────────────────────────────────────────────────────
+  if (toggle) {
+    toggle.addEventListener('click', function () {
+      applyLang(window.__currentLang === 'en' ? 'es' : 'en', true);
+    });
+  }
 }());

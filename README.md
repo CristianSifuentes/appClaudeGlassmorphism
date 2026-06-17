@@ -66,6 +66,9 @@ In light mode the glass warms: higher opacity, amber tint, sepia shadow. The sam
 | ✓ | **Real contact backend** | Formspree integration. One `const FORM_ENDPOINT` at the top of `script.js`. Three states: `is-sending` (pulse animation), `is-sent` (green), `is-error` (rose + fallback email link). Status line fades up via `aria-live`. Demo mode when endpoint is empty. |
 | ✓ | **Ambient particle field** | 55-particle `<canvas>` constellation behind the orbs. Random-walk drift at ≤ 0.28 px/frame. Independent sine-wave breathing per particle. Constellation lines at ≤ 0.5px, fading with distance. Theme-colour lerp over ~2s. DPR-aware. `prefers-reduced-motion` silent. |
 | ✓ | **Blog / writing section** | Three glass cards rendered from `posts.js`. Markdown parsed client-side via `marked.js`. Full post opens in a reading modal with literary typography — blockquotes, inline code, `<hr>` dividers, comfortable 1.85 line-height. Separate GSAP stagger for dynamically rendered cards. |
+| ✓ | **PWA support** | `manifest.json` + service worker. Cache-first for local assets, stale-while-revalidate for CDN. Pre-caches the full reading experience on first visit. Offline navigation falls back to `index.html`. Installable to home screen. Theme-aware `theme-color` meta for native status bar. |
+| ✓ | **Multilingual support** | English / Spanish. All UI strings in `lang.js` — one object per language. `data-i18n` attributes on every translatable element. Glass pill toggle in the nav. 160ms opacity-fade crossfade on switch. `localStorage` persistence. Browser language auto-detection on first load. Typewriter roles and form reset text update live. |
+| ✓ | **Image optimisation** | `<picture>` element with WebP `<source>` + JPEG fallback — browser selects format before JS runs. `srcset` at 400w and 800w with `sizes`. `loading="lazy"` + `decoding="async"` on all project thumbnails. 650ms opacity reveal on load. Emoji fallback holds the frame until the photograph arrives; yields silently when it does. No-JS fallback via `<noscript>`. |
 | ✓ | **Glassmorphism card system** | `.glass` utility — backdrop blur, translucent fill, luminous border, soft shadow |
 | ✓ | **Floating hero card** | Sine-wave float animation with subtle 3-axis mouse tilt |
 | ✓ | **Scroll reveal** | `IntersectionObserver` — elements rise as they enter the viewport |
@@ -328,6 +331,159 @@ backdrop.addEventListener('transitionend', () => {
 
 ---
 
+## Image Optimisation — How It Works
+
+The portfolio does not demand attention. Images arrive when the reader does — never earlier, never announced. The emoji holds the frame open, patient, until the photograph takes its place. And when the photograph arrives, it does not snap into existence. It surfaces slowly, over 650 milliseconds — the way a print emerges in developer fluid in a darkroom: first a suggestion, then a shape, then the full image. The emoji fades in parallel, slightly faster, so the transition feels like replacement rather than layering.
+
+**The `<picture>` element.** Each project thumbnail is a `<picture>` containing a `<source type="image/webp">` and an `<img>` fallback. The browser chooses the format before JavaScript runs — before layout, before paint, in the fetch pipeline. If it understands WebP, it fetches the `.webp` file (30–50% smaller than JPEG at equivalent quality); if not, it falls back to the `.jpg`. No detection script. No format negotiation in code. The HTML already knows what to offer and to whom.
+
+**`srcset` and sizes.** Each WebP source carries two variants — `400w` and `800w` — alongside a `sizes` attribute describing the rendered width at each breakpoint. The browser selects the most efficient file for the current screen: a phone on a narrow viewport fetches the 400px variant; a retina desktop fetches the 800px. A visitor on slow cellular does not download a 1600-pixel image they will never see at full resolution. Bandwidth spent on pixels never seen is weight the page was not asked to carry.
+
+**Native lazy loading.** `loading="lazy"` defers the fetch until the image is within the browser's native threshold — typically 1200px from the viewport, configurable by the browser, not by the developer. This is not JavaScript. It is a browser primitive, implemented in the network layer, before layout, costing nothing on the main thread. `decoding="async"` further ensures that converting compressed bytes to visible pixels does not block the frame between paints. The images load; the rest of the page does not wait.
+
+**The emoji and the fallback.** The `.project-image` div — the emoji — lives as an absolutely-positioned layer inside the `<figure>`. It is not a placeholder to be discarded once the real image arrives. For visitors who never load images (data-savers, readers offline after the first visit, portrait contexts where the thumbnail doesn't reach the viewport), the emoji *is* the design. When `.is-loaded` fires on the `<img>`, JavaScript adds `.has-image` to the `<figure>`. A CSS rule targets `.project-thumb.has-image .project-image` and fades the emoji to `opacity: 0`. The photograph and the emoji animate in parallel — the image arriving, the symbol yielding — at slightly different speeds so neither abruptly vanishes.
+
+**The `alt` attribute.** Every project thumbnail carries `alt=""` — not a missing attribute, but an explicitly empty one. The distinction matters to screen readers: `alt=""` marks the image as *decorative*. The semantic content — title, description, tags — is already present in the card's headings. The image, when it exists, adds only visual texture. Its absence, announced by an empty `alt`, tells assistive technology: *there is nothing here that you are missing.*
+
+**No-JS safety.** The reveal animation (`opacity: 0 → 1`) is a CSS rule, set permanently. Without JavaScript, `.is-loaded` is never added and every project thumbnail remains invisible. A `<noscript>` tag in the `<head>` overrides this with `opacity: 1 !important` — so the portfolio looks correct in environments where JavaScript is unavailable.
+
+**Adding a project image.** Create two WebP files and one JPEG per project. Name them following the pattern below and drop them into the `images/` folder:
+
+```
+images/
+├── luminary-400.webp    400px wide — served to narrow viewports
+├── luminary-800.webp    800px wide — served to wide viewports
+├── luminary.jpg         JPEG fallback for non-WebP browsers
+├── verdant-400.webp
+├── verdant-800.webp
+├── verdant.jpg
+├── pulse-400.webp
+├── pulse-800.webp
+└── pulse.jpg
+```
+
+The `<picture>` element is already in the HTML. The emoji fallback is already visible. When the files exist, the reveal plays automatically. No JavaScript changes. No CSS changes. One folder, three pairs of images, and the portfolio becomes photographic.
+
+```html
+<!-- The picture element: WebP first, JPEG fallback, browser decides -->
+<picture class="project-thumb__picture">
+  <source type="image/webp"
+          srcset="images/luminary-400.webp 400w,
+                  images/luminary-800.webp 800w"
+          sizes="(max-width: 900px) 100vw, 45vw" />
+  <img src="images/luminary.jpg"
+       alt=""
+       width="800" height="450"
+       loading="lazy"
+       decoding="async"
+       class="project-thumb__img img-reveal" />
+</picture>
+```
+
+```js
+// The reveal — a print surfacing in developer fluid
+img.addEventListener('load', function () {
+  img.classList.add('is-loaded');   // image fades in over 650ms
+  thumb.classList.add('has-image'); // emoji fades out over 450ms
+}, { once: true });
+```
+
+---
+
+## Multilingual Support — How It Works
+
+A portfolio speaks one language. But a person holds more than one inside them.
+
+The toggle is a small glass pill in the navigation — not labelled with the current language, but with the other one. It shows you the self you have not yet chosen. Pressing it is the act of crossing over. The visible text dims, holds — a breath held for 160 milliseconds — and then returns in Spanish. Or in English. The glass is the same. The light is the same. Only the words change, and yet the feeling of the portfolio shifts entirely: a second register, a second voice, the same work seen from a different angle of the self.
+
+**The translation object.** All UI strings live in `lang.js` — a single `LANG` constant with an object for each language code. Every string is namespaced: `LANG.es.about.c1.title`, `LANG.en.hero.greeting`. Adding a new language means adding one object to `LANG` with the same key structure. No other file needs to change.
+
+**The `data-i18n` system.** Every translatable element in `index.html` carries a `data-i18n="dot.path.key"` attribute. Form inputs carry `data-i18n-placeholder="dot.path.key"` for their placeholder text. On language switch, the IIFE queries all `[data-i18n]` elements and sets `textContent` from the resolved path — a depth-first walk down the language object with a simple `reduce`. If a key does not resolve, the element is left unchanged.
+
+**The crossfade.** When the toggle fires, all `[data-i18n]` elements receive inline `transition: opacity 0.16s ease` and `opacity: 0`. After 160ms — the fade completes — the text swaps and `opacity: 1` triggers the return. After another 220ms, the inline styles are removed so no element's permanent transitions are altered. The whole animation is 380ms of borrowed style, leaving nothing behind.
+
+**The typewriter.** The hero headline types through five roles that describe the same person in five different ways. In Spanish, those roles are different sentences — different textures, different lengths. The language switcher calls `window.__setTypewriterLang(roles)` — exposed by the typewriter IIFE — passing the new roles array. The currently-typing word is not interrupted: it finishes its erasure, and the next word that begins is already in the new language. A natural transition: the old voice speaks its last word, the new voice takes the next breath.
+
+**Persistence and detection.** Language preference is saved to `localStorage` under the key `'lang'`. On first visit, if no preference is saved, the IIFE reads `navigator.language`, extracts the two-character code, and checks whether `LANG` has a matching entry. Spanish browsers open in Spanish. All others open in English. The preference persists across sessions, offline reads, and home-screen launches.
+
+**The form.** When the contact form is submitted, the button enters temporary states — "Sending…", "Message received ✓" — in English regardless of the current language. These are transient: the reader sees them for five seconds or less. When the form resets, the button returns to `LANG[currentLang].contact.submit` — the correct language — so it is always in the right tongue after the moment passes.
+
+**Adding a third language.** Open `lang.js`. Copy the `en` block. Rename it `fr` (or `de`, or any two-character code). Translate the strings. The detection logic, the fade mechanism, the typewriter update, the form reset — none of them need to know. They read from whatever `LANG[code]` contains.
+
+```js
+// The resolution — a dot path walks the object
+function resolve(obj, path) {
+  return path.split('.').reduce((o, k) => o && o[k] !== undefined ? o[k] : null, obj);
+}
+
+// The crossfade — borrowed opacity, returned after the swap
+targets.forEach((el) => { el.style.transition = 'opacity 0.16s ease'; el.style.opacity = '0'; });
+setTimeout(() => {
+  swap(code);                                        // words change
+  targets.forEach((el) => { el.style.opacity = '1'; }); // words return
+  setTimeout(() => targets.forEach((el) => {         // inline styles released
+    el.style.transition = ''; el.style.opacity = '';
+  }), 220);
+}, 160);
+
+// The typewriter — old voice finishes, new voice begins
+window.__setTypewriterLang = function (newRoles) { roles = newRoles; };
+```
+
+---
+
+## PWA Support — How It Works
+
+The portfolio remembers itself.
+
+When a visitor leaves and the network forgets them, the service worker — a quiet process living between the browser and the world — holds every file the portfolio needs to exist. The styles. The writing. The particles. The glass. When they return offline, the portfolio is there. Not a placeholder, not an error screen. The same surface, the same depth, the same frosted light — as though the absence of connection had changed nothing at all.
+
+**The manifest.** A small JSON file — `manifest.json` — tells the browser how to present the portfolio when it is installed to a home screen. The name, the icon, the theme colour. `display: standalone` removes the browser chrome: no address bar, no tabs. The installed version looks like an app — a window into the design, without the scaffolding of the web showing through. The launch background is `#0a0a0a`, the same near-black the portfolio opens with. Continuity, from icon tap to first render.
+
+**The icon.** An SVG — dark ground, two concentric glass circles at different radii and opacities, the initials *CS* in the accent colour. Precise, scalable to any resolution, indifferent to screen density. A monogram is not a logo. It is a signature.
+
+**The service worker.** Registered on page load and installed silently. On first visit with a connection, it pre-caches six local assets — `index.html`, `style.css`, `script.js`, `posts.js`, `manifest.json`, `icon.svg` — and the Google Fonts stylesheet. `Promise.allSettled` is used for the install: if one CDN asset is temporarily unreachable, the others still succeed. The install does not break for one failure. The portfolio still installs.
+
+**Cache strategy — two movements.** Same-origin files use **cache-first**: return the remembered copy immediately, consult the network only when there is no entry. The portfolio's own files do not change between visits; there is no reason to wait for the network. CDN assets — GSAP, marked.js, Google Fonts files — use **stale-while-revalidate**: serve the cached version instantly (fast), fetch a fresh copy in the background (current). Speed and freshness, balanced against each other.
+
+**Offline navigation.** If the reader opens the portfolio without a connection and no cached response exists for the URL, the service worker falls back to `./index.html`. The portfolio shell loads. The glass holds. The writing is there. The portfolio was always already present — the network was only ever a delivery mechanism for the first visit.
+
+**Cache versioning.** The cache is named `cs-portfolio-v1`. On activate, every cache whose name does not match is deleted — old glass, cleared. When assets change, increment the version string. The next visit brings the new cache; the old one is released without ceremony.
+
+**Theme-aware status bar.** Two `<meta name="theme-color">` tags — one scoped to `prefers-color-scheme: dark`, one to `light` — match the browser chrome and native status bar to the portfolio's current palette. In dark mode: `#0a0a0a`, the same as the background. In light mode: `#ede8df`, the same warm parchment. Whether the portfolio lives in the browser or on the home screen, the interface extends without a seam.
+
+```js
+// The guardian registers silently — no error is user-facing
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+```
+
+```js
+// Cache-first: serve memory; the network is only for what memory does not hold
+async function cacheFirst(request) {
+  const cached = await caches.match(request);
+  if (cached) return cached;                     // remembered — serve it
+  const response = await fetch(request);         // new — fetch and remember
+  if (response.ok) caches.open(CACHE).then((c) => c.put(request, response.clone()));
+  return response;
+}
+
+// Stale-while-revalidate: fast now, fresh next time
+async function staleWhileRevalidate(request) {
+  const cache  = await caches.open(CACHE);
+  const cached = await cache.match(request);
+  const fetchPromise = fetch(request)
+    .then((r) => { if (r.ok) cache.put(request, r.clone()); return r; })
+    .catch(() => cached);                        // network failure: the cache is enough
+  return cached || fetchPromise;                 // cached → instant; uncached → wait
+}
+```
+
+---
+
 ## Quick Start
 
 ```bash
@@ -347,6 +503,11 @@ glassmorphism-portfolio/
 ├── style.css      design token system, glass utility, both themes, markdown typography
 ├── script.js      magnetic cursor, typed headline, theme toggle, particles, modals, blog
 ├── posts.js       writing content — add new entries here, Markdown rendered at runtime
+├── images/        project thumbnails — add WebP pairs + JPEG fallbacks here (see Image Optimisation)
+├── lang.js        all UI strings in EN and ES — add a language by adding one object
+├── manifest.json  PWA manifest — app identity, icons, theme colour, display mode
+├── sw.js          service worker — cache-first strategy, offline reading
+├── icon.svg       app icon — CS monogram on dark glass, used for home-screen install
 ├── README.md      you are here
 └── LICENSE
 ```
@@ -468,9 +629,9 @@ Ordered by emotional impact on the viewer.
 - [x] **Real contact backend** — wire the form to Formspree or EmailJS; one environment variable
 - [x] **Ambient particle field** — a slow, sparse `<canvas>` constellation behind the orbs
 - [x] **Blog / writing section** — thoughts rendered from Markdown; the voice behind the work
-- [ ] **PWA support** — `manifest.json` and a service worker for offline reading
-- [ ] **Multilingual support** — a second language, a second self
-- [ ] **Image optimisation** — WebP with `srcset`, native lazy loading
+- [x] **PWA support** — `manifest.json` and a service worker for offline reading
+- [x] **Multilingual support** — a second language, a second self
+- [x] **Image optimisation** — WebP with `srcset`, native lazy loading
 
 ---
 
