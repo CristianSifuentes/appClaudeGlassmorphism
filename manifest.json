@@ -1,0 +1,21 @@
+{
+  "name": "Cristian Sifuentes — Portfolio",
+  "short_name": "CS Portfolio",
+  "description": "Design engineer. Frontend sculptor. A builder of careful things.",
+  "start_url": ".",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#0a0a0a",
+  "background_color": "#0a0a0a",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["portfolio", "design", "development"]
+}
