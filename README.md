@@ -60,12 +60,45 @@ In light mode the glass warms: higher opacity, amber tint, sepia shadow. The sam
 |---|---|---|
 | ✓ | **Dark / Light theme toggle** | Glass pill toggle with spring-physics thumb. System preference detected on first load, `localStorage` for persistence. Crossfading dual-layer gradient background. Orbs shift from cool cobalt to warm amber dust. |
 | ✓ | **Magnetic cursor** | Custom dot + trailing glow. Quadratic gravitational pull toward glass cards. `mix-blend-mode: screen` in dark mode; normalises in light. Silent on touch devices. |
+| ✓ | **Typed headline** | Hero h1 cycles through five roles. Recursive `setTimeout`, variable character timing, 2800ms held pause per word. 2px blinking cursor. `prefers-reduced-motion` safe. |
 | ✓ | **Glassmorphism card system** | `.glass` utility — backdrop blur, translucent fill, luminous border, soft shadow |
 | ✓ | **Floating hero card** | Sine-wave float animation with subtle 3-axis mouse tilt |
 | ✓ | **Scroll reveal** | `IntersectionObserver` — elements rise as they enter the viewport |
 | ✓ | **Animated skill bars** | Fill on scroll entry via `data-width`; eased cubic-bezier fill |
 | ✓ | **Responsive layout** | CSS Grid, `clamp()` fluid type, graceful mobile collapse |
 | ✓ | **Contact form feedback** | Submit state with colour confirmation and auto-reset |
+
+---
+
+## Typed Headline — How It Works
+
+The hero `h1` is split into two parts: a static portion — the name and em-dash — and a typed portion that cycles through five roles. No library. A single recursive `setTimeout` and two state variables: current character index, and whether we are typing or erasing.
+
+**The timing is the emotion.** A 2800ms pause sits after every complete word — nearly three seconds of stillness. This is not a delay. It is a breath. The role appears, the page waits *with you*, and only then lets it go. The erasure takes roughly one second, unhurried. Then a 420ms silence before the next word begins. The rhythm: *arrive — rest — depart — breathe — arrive again.*
+
+**Human imperfection.** Each character is typed after a random delay between 55ms and 95ms. The range is small but decisive — it separates a machine from a person. Erasing runs faster (35–60ms) and with a narrower band: erasing is mechanical, typing is considered.
+
+**The cursor.** A 2px hairline — not a `_`, not a blinking block. It holds solid during typing (`animation-play-state: paused`) — full attention, no distraction. During the long pause it blinks at 1.06s with `ease-in-out` — present, then absent, like a thought that hasn't finished forming. The blink period is slightly longer than the standard 1s: slower, more meditative.
+
+**The five roles** are chosen for texture, not just meaning:
+
+| Role | Quality |
+|---|---|
+| `a design engineer.` | Grounded, the professional truth |
+| `a frontend sculptor.` | Material, physical — implies craft and form |
+| `a builder of careful things.` | Melancholic restraint — *careful*, not grand |
+| `a visual architect.` | Structural, considered |
+| `a pixel poet.` | Short, almost a confession |
+
+**Accessibility.** `prefers-reduced-motion: reduce` displays the first role statically and hides the cursor entirely. No animation, no distraction — the content is the same.
+
+```js
+// The pause IS the emotion — 2800ms of stillness between each self
+setTimeout(tick, PAUSE_FULL);
+
+// Randomness humanises — no two characters arrive at the same speed
+setTimeout(tick, 55 + Math.random() * 40);
+```
 
 ---
 
@@ -137,7 +170,7 @@ xdg-open index.html   # Linux
 glassmorphism-portfolio/
 ├── index.html     main HTML — all sections live here
 ├── style.css      design token system, glass utility, both themes
-├── script.js      magnetic cursor, theme toggle, reveal, skill bars, card tilt
+├── script.js      magnetic cursor, typed headline, theme toggle, reveal, skill bars, card tilt
 ├── README.md      you are here
 └── LICENSE
 ```
@@ -192,6 +225,11 @@ The light-mode accent lives in `[data-theme="light"]` and follows the same patte
 | **Cursor glow trail** | Follows dot (RAF) | per-frame lerp `t=0.07` | Heavy drift |
 | **Cursor near glass** | 140px proximity | 250ms dot / 550ms glow | `ease` |
 | **Cursor blend** | Theme switch | 450ms | `ease` |
+| **Type one character** | RAF / setTimeout | 55–95ms random | Human variation |
+| **Erase one character** | RAF / setTimeout | 35–60ms random | Mechanical, narrower |
+| **Pause after full word** | Word complete | 2800ms | The long breath |
+| **Pause after full erase** | Word erased | 420ms | The short breath |
+| **Cursor blink** | Idle / pause | 1060ms cycle | `ease-in-out` |
 | Scroll reveal | Enter viewport | 700ms | `ease` |
 | Skill bar fill | Section visible | 1200ms | `cubic-bezier(0.25,0.8,0.25,1)` |
 | Card tilt | Mouse move | 100ms | `ease` |
@@ -233,7 +271,7 @@ Ordered by emotional impact on the viewer.
 
 - [x] **Dark / Light theme toggle** — spring toggle, crossfading gradient layers, system preference, `localStorage`
 - [x] **Magnetic cursor** — dot + trailing glow, quadratic glass attraction, `mix-blend-mode: screen`, touch-safe
-- [ ] **Typed headline** — the hero `h1` cycles through roles with a typewriter cursor and a long pause between
+- [x] **Typed headline** — recursive `setTimeout`, five roles, 2800ms held pause, 2px blinking cursor, reduced-motion safe
 - [ ] **Project detail modals** — click a card; the world behind it blurs into a glass overlay
 - [ ] **Staggered section transitions** — sections drift in with GSAP timelines, each child delayed by 80ms
 - [ ] **Real contact backend** — wire the form to Formspree or EmailJS; one environment variable

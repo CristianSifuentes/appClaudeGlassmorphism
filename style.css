@@ -483,6 +483,40 @@ nav.scrolled {
   opacity: 0.90;
 }
 
+/* ─── Typewriter headline ────────────────────────────────────────
+   The cursor waits. The word arrives, letter by letter.
+   Then a long breath — quiet consideration — before the slow
+   erasure. Then silence, and the next truth begins.
+   ────────────────────────────────────────────────────────────── */
+.typed-line {
+  display: inline;
+}
+
+/* Thin vertical bar — a hairline, not a block. Present, honest. */
+.typed-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 0.78em;
+  background-color: var(--accent);
+  margin-left: 3px;
+  vertical-align: middle;
+  border-radius: 1px;
+  animation: typed-blink 1.06s ease-in-out infinite;
+  transition: background-color 0.45s ease;
+}
+
+/* While typing: cursor holds still — no blinking, full attention */
+.typed-cursor.is-typing {
+  animation-play-state: paused;
+  opacity: 1;
+}
+
+/* The blink: slow enough to feel like breathing, not flickering */
+@keyframes typed-blink {
+  0%, 44%   { opacity: 1; }
+  56%, 100% { opacity: 0; }
+}
+
 /* ─── Hero ─────────────────────────────────────────────────────── */
 #hero {
   min-height: 100vh;
