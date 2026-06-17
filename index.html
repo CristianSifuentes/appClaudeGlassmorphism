@@ -205,7 +205,9 @@
 
       <div class="projects-grid">
 
-        <div class="glass project-card reveal">
+        <div class="glass project-card reveal"
+             role="button" tabindex="0" aria-haspopup="dialog"
+             data-detail="A complete design-to-code engagement for a B2B analytics platform serving data teams across three continents. The work spanned a component library of 48 elements, a real-time chart engine hand-built without third-party dependencies, and a dark mode careful enough to account for the eye's slower adaptation to blue light at night. The goal: a dashboard that analysts could look at for eight hours without fatigue — calm under pressure, honest with complexity.">
           <div class="project-image">📊</div>
           <h3>Luminary — Analytics Dashboard</h3>
           <p>
@@ -220,7 +222,9 @@
           <a href="#" class="project-link">View case study →</a>
         </div>
 
-        <div class="glass project-card reveal">
+        <div class="glass project-card reveal"
+             role="button" tabindex="0" aria-haspopup="dialog"
+             data-detail="A full UX audit and storefront redesign for a direct-to-consumer sustainable brand. The work began with session recordings and scroll heatmaps — watching strangers navigate the old site, noticing where they hesitated, where they left. Three friction points in the checkout flow accounted for most of the abandonment. The redesign was quiet rather than flashy: clearer hierarchy, less noise, a checkout that asked fewer questions. Conversion improved 34% in the first four weeks.">
           <div class="project-image">🌿</div>
           <h3>Verdant — E-commerce Store</h3>
           <p>
@@ -235,7 +239,9 @@
           <a href="#" class="project-link">View case study →</a>
         </div>
 
-        <div class="glass project-card reveal">
+        <div class="glass project-card reveal"
+             role="button" tabindex="0" aria-haspopup="dialog"
+             data-detail="A cross-platform fitness application built for a personal training startup launching simultaneously on iOS and Android. The custom animation system replaced default spring physics with hand-tuned curves — motion that feels like the body moving, not a UI sliding. Offline support was non-negotiable: users train in basements, in garages, in places with no signal. The app had to hold what it knew and work with whatever was there.">
           <div class="project-image">📱</div>
           <h3>Pulse — Fitness Mobile App</h3>
           <p>
@@ -300,6 +306,31 @@
       </p>
     </div>
   </footer>
+
+  <!-- ── Project detail modal ── -->
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+    <div class="modal-glass" id="modalPanel"
+         role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="modalClose" aria-label="Close project details">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <line x1="18" y1="6"  x2="6"  y2="18"/>
+          <line x1="6"  y1="6"  x2="18" y2="18"/>
+        </svg>
+      </button>
+      <div class="modal-scroll">
+        <div class="modal-body">
+          <div class="modal-hero" id="modalHero"></div>
+          <div class="modal-tag-row" id="modalTagRow"></div>
+          <h2 class="modal-title" id="modalTitle"></h2>
+          <p class="modal-desc" id="modalDesc"></p>
+          <p class="modal-detail" id="modalDetail"></p>
+          <a class="btn-primary modal-cta" id="modalCta" href="#">View case study →</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

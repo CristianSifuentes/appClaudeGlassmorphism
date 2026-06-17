@@ -53,7 +53,7 @@ themeToggle.addEventListener('click', () => {
   });
 
   // ── Interactive elements change cursor behaviour ─────────────────
-  document.querySelectorAll('a, button, label, input, textarea').forEach((el) => {
+  document.querySelectorAll('a, button, label, input, textarea, [role="button"]').forEach((el) => {
     el.addEventListener('mouseenter', () => {
       dot.classList.add('is-interactive');
       glow.classList.add('is-interactive');
@@ -204,6 +204,101 @@ themeToggle.addEventListener('click', () => {
 
   // Begin after the hero reveal settles (≈700ms transition) + a short breath
   setTimeout(tick, 1200);
+}());
+
+// ─── Project detail modals ──────────────────────────────────────
+// Click a card and the world behind it softens, recedes.
+// The glass panel rises through the blurred haze — the rest of
+// the page held at a respectful, impressionistic distance.
+(function () {
+  const backdrop   = document.getElementById('modalBackdrop');
+  const closeBtn   = document.getElementById('modalClose');
+  const modalHero  = document.getElementById('modalHero');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalDesc  = document.getElementById('modalDesc');
+  const modalDetail = document.getElementById('modalDetail');
+  const modalTagRow = document.getElementById('modalTagRow');
+  const modalCta   = document.getElementById('modalCta');
+
+  if (!backdrop) return;
+
+  let lastFocused = null;
+
+  function open(card) {
+    // Read content from the card's existing DOM — no duplication
+    const emoji  = card.querySelector('.project-image').textContent.trim();
+    const title  = card.querySelector('h3').textContent.trim();
+    const desc   = card.querySelector('p').textContent.trim();
+    const detail = card.dataset.detail || '';
+    const tags   = Array.from(card.querySelectorAll('.tag')).map((t) => t.textContent.trim());
+    const href   = card.querySelector('.project-link')?.getAttribute('href') || '#';
+
+    // Populate the glass panel
+    modalHero.textContent  = emoji;
+    modalTitle.textContent = title;
+    modalDesc.textContent  = desc;
+    modalDetail.textContent = detail;
+    modalDetail.style.display = detail ? '' : 'none';
+
+    modalTagRow.innerHTML = '';
+    tags.forEach((tag) => {
+      const span = document.createElement('span');
+      span.className = 'tag';
+      span.textContent = tag;
+      modalTagRow.appendChild(span);
+    });
+
+    modalCta.href = href;
+
+    // Prevent scrollbar-shift jank
+    const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.paddingRight = scrollbarW + 'px';
+    document.body.style.overflow     = 'hidden';
+
+    // Open — the world blurs in
+    lastFocused = document.activeElement;
+    backdrop.removeAttribute('aria-hidden');
+    backdrop.classList.add('is-open');
+
+    setTimeout(() => closeBtn.focus(), 50);
+  }
+
+  function close() {
+    backdrop.classList.remove('is-open');
+    document.body.style.overflow     = '';
+    document.body.style.paddingRight = '';
+    if (lastFocused) lastFocused.focus();
+
+    // Restore aria-hidden only after the fade-out completes
+    backdrop.addEventListener(
+      'transitionend',
+      () => backdrop.setAttribute('aria-hidden', 'true'),
+      { once: true }
+    );
+  }
+
+  // Wire every project card — click or Enter/Space to open
+  document.querySelectorAll('.project-card').forEach((card) => {
+    card.addEventListener('click', () => open(card));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        open(card);
+      }
+    });
+  });
+
+  closeBtn.addEventListener('click', close);
+
+  // Click the dark backdrop area (outside the panel) to close
+  backdrop.addEventListener('click', (e) => {
+    if (e.target === backdrop) close();
+  });
+
+  // Escape to close — the world reassembles gently behind you
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && backdrop.classList.contains('is-open')) close();
+  });
 }());
 
 // ─── Nav scroll effect ─────────────────────────────────────────
