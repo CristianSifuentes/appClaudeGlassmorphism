@@ -11,12 +11,12 @@
    ═══════════════════════════════════════════════════════════════ */
 :root {
   /* Page gradients */
-  --bg-dark-start:  #0a0a0a;
-  --bg-dark-mid:    #1a1a2e;
-  --bg-dark-end:    #16213e;
-  --bg-light-start: #ede8df;
-  --bg-light-mid:   #e5ddd0;
-  --bg-light-end:   #dbd3c5;
+  --bg-dark-start:  #080808;
+  --bg-dark-mid:    #111111;
+  --bg-dark-end:    #0d0d0d;
+  --bg-light-start: #f8f8f8;
+  --bg-light-mid:   #f0f0f0;
+  --bg-light-end:   #e8e8e8;
 
   /* Glass system */
   --glass-bg:           rgba(255, 255, 255, 0.05);
@@ -27,51 +27,51 @@
   --glass-shadow-hover: 0 12px 48px 0 rgba(0, 0, 0, 0.55);
   --glass-blur:         20px;
 
-  /* Accent — cool periwinkle blue */
-  --accent:              #7c9cff;
-  --accent-dim:          rgba(124, 156, 255, 0.15);
-  --accent-border:       rgba(124, 156, 255, 0.25);
-  --accent-border-focus: rgba(124, 156, 255, 0.60);
-  --accent-btn-bg:       rgba(124, 156, 255, 0.20);
-  --accent-btn-hover:    rgba(124, 156, 255, 0.38);
-  --accent-glow:         rgba(124, 156, 255, 0.22);
+  /* Accent — silver */
+  --accent:              #c8c8c8;
+  --accent-dim:          rgba(200, 200, 200, 0.12);
+  --accent-border:       rgba(200, 200, 200, 0.20);
+  --accent-border-focus: rgba(200, 200, 200, 0.52);
+  --accent-btn-bg:       rgba(200, 200, 200, 0.10);
+  --accent-btn-hover:    rgba(200, 200, 200, 0.18);
+  --accent-glow:         rgba(200, 200, 200, 0.14);
 
   /* Typography */
   --text-primary:   #f0f0f0;
-  --text-secondary: #9ba3b8;
-  --text-muted:     #5a6278;
+  --text-secondary: #888888;
+  --text-muted:     #505050;
 
   /* Theme-aware gradients */
-  --gradient-name:        linear-gradient(135deg, #f0f0f0 0%, #7c9cff 60%, #a78bfa 100%);
-  --gradient-accent:      linear-gradient(135deg, #7c9cff, #a78bfa);
-  --gradient-skill:       linear-gradient(90deg,  #7c9cff, #a78bfa);
-  --gradient-submit:      linear-gradient(135deg, rgba(124, 156, 255, 0.25), rgba(167, 139, 250, 0.25));
-  --gradient-project-img: linear-gradient(135deg, rgba(124, 156, 255, 0.12), rgba(167, 139, 250, 0.12));
+  --gradient-name:        linear-gradient(135deg, #f0f0f0 0%, #c8c8c8 60%, #888888 100%);
+  --gradient-accent:      linear-gradient(135deg, #c8c8c8, #888888);
+  --gradient-skill:       linear-gradient(90deg,  #888888, #c8c8c8);
+  --gradient-submit:      linear-gradient(135deg, rgba(200, 200, 200, 0.16), rgba(136, 136, 136, 0.16));
+  --gradient-project-img: linear-gradient(135deg, rgba(200, 200, 200, 0.07), rgba(136, 136, 136, 0.07));
 
   /* Nav */
-  --nav-scrolled-bg: rgba(10, 10, 10, 0.65);
+  --nav-scrolled-bg: rgba(8, 8, 8, 0.82);
 
   /* Form */
   --input-bg:       rgba(255, 255, 255, 0.04);
-  --input-bg-focus: rgba(124, 156, 255, 0.05);
+  --input-bg-focus: rgba(200, 200, 200, 0.04);
 
   /* Skill track */
   --skill-track: rgba(255, 255, 255, 0.06);
 
-  /* Orbs — solid colors + filter: blur() creates the ambient glow */
-  --orb-1-color: #3a4fd7;
-  --orb-2-color: #6b3fa0;
-  --orb-3-color: #1a4a8a;
-  --orb-opacity: 0.18;
+  /* Orbs — dark grays; blur creates the ambient depth */
+  --orb-1-color: #2e2e2e;
+  --orb-2-color: #222222;
+  --orb-3-color: #282828;
+  --orb-opacity: 0.22;
 
   /* Cursor */
-  --cursor-color:     #7c9cff;
-  --cursor-glow-core: rgba(124, 156, 255, 0.50);
-  --cursor-glow-edge: rgba(124, 156, 255, 0);
+  --cursor-color:     #c8c8c8;
+  --cursor-glow-core: rgba(200, 200, 200, 0.40);
+  --cursor-glow-edge: rgba(200, 200, 200, 0);
 
   /* Modal */
-  --modal-backdrop-bg: rgba(4, 4, 14, 0.64);
-  --modal-glass-bg:    rgba(13, 16, 30, 0.84);
+  --modal-backdrop-bg: rgba(4, 4, 4, 0.72);
+  --modal-glass-bg:    rgba(12, 12, 12, 0.90);
 
   /* Form status feedback */
   --form-status-success: rgba(52, 211, 153, 0.90);
@@ -91,62 +91,62 @@
    objects — warm, unhurried, and a little sad.
    ═══════════════════════════════════════════════════════════════ */
 [data-theme="light"] {
-  /* Glass — warm frosted amber, like old church windows */
-  --glass-bg:           rgba(255, 251, 244, 0.52);
-  --glass-bg-hover:     rgba(255, 251, 244, 0.72);
-  --glass-border:       rgba(170, 155, 130, 0.28);
-  --glass-border-hover: rgba(155, 135, 105, 0.52);
-  --glass-shadow:       0 8px 32px 0 rgba(60, 45, 28, 0.10);
-  --glass-shadow-hover: 0 12px 48px 0 rgba(60, 45, 28, 0.18);
+  /* Glass — clean frosted white, like a gallery wall */
+  --glass-bg:           rgba(255, 255, 255, 0.68);
+  --glass-bg-hover:     rgba(255, 255, 255, 0.86);
+  --glass-border:       rgba(0, 0, 0, 0.08);
+  --glass-border-hover: rgba(0, 0, 0, 0.16);
+  --glass-shadow:       0 8px 32px 0 rgba(0, 0, 0, 0.06);
+  --glass-shadow-hover: 0 12px 48px 0 rgba(0, 0, 0, 0.11);
   --glass-blur:         28px;
 
-  /* Accent — dusty slate periwinkle, melancholic and still */
-  --accent:              #5d7a9e;
-  --accent-dim:          rgba(93, 122, 158, 0.10);
-  --accent-border:       rgba(93, 122, 158, 0.28);
-  --accent-border-focus: rgba(93, 122, 158, 0.62);
-  --accent-btn-bg:       rgba(93, 122, 158, 0.14);
-  --accent-btn-hover:    rgba(93, 122, 158, 0.28);
-  --accent-glow:         rgba(93, 122, 158, 0.18);
+  /* Accent — deep charcoal, ink pressed into white paper */
+  --accent:              #2c2c2c;
+  --accent-dim:          rgba(44, 44, 44, 0.08);
+  --accent-border:       rgba(44, 44, 44, 0.18);
+  --accent-border-focus: rgba(44, 44, 44, 0.45);
+  --accent-btn-bg:       rgba(44, 44, 44, 0.08);
+  --accent-btn-hover:    rgba(44, 44, 44, 0.16);
+  --accent-glow:         rgba(44, 44, 44, 0.10);
 
-  /* Typography — warm ink on aged paper */
-  --text-primary:   #221e17;
-  --text-secondary: #6b5f52;
-  --text-muted:     #a09080;
+  /* Typography — clean ink on white */
+  --text-primary:   #0c0c0c;
+  --text-secondary: #585858;
+  --text-muted:     #959595;
 
-  /* Gradients shift to warm earth and dusty mauve */
-  --gradient-name:        linear-gradient(135deg, #221e17 0%, #5d7a9e 55%, #7a6fa8 100%);
-  --gradient-accent:      linear-gradient(135deg, #5d7a9e, #8a7ea8);
-  --gradient-skill:       linear-gradient(90deg,  #5d7a9e, #8a7ea8);
-  --gradient-submit:      linear-gradient(135deg, rgba(93, 122, 158, 0.20), rgba(130, 110, 165, 0.20));
-  --gradient-project-img: linear-gradient(135deg, rgba(93, 122, 158, 0.10), rgba(130, 110, 165, 0.10));
+  /* Gradients — charcoal through mid-gray */
+  --gradient-name:        linear-gradient(135deg, #0c0c0c 0%, #2c2c2c 50%, #707070 100%);
+  --gradient-accent:      linear-gradient(135deg, #2c2c2c, #707070);
+  --gradient-skill:       linear-gradient(90deg,  #2c2c2c, #707070);
+  --gradient-submit:      linear-gradient(135deg, rgba(44, 44, 44, 0.12), rgba(112, 112, 112, 0.12));
+  --gradient-project-img: linear-gradient(135deg, rgba(44, 44, 44, 0.05), rgba(112, 112, 112, 0.05));
 
   /* Nav */
-  --nav-scrolled-bg: rgba(237, 232, 223, 0.85);
+  --nav-scrolled-bg: rgba(248, 248, 248, 0.90);
 
-  /* Form — parchment warmth */
-  --input-bg:       rgba(255, 251, 244, 0.65);
-  --input-bg-focus: rgba(93, 122, 158, 0.07);
+  /* Form — clean white */
+  --input-bg:       rgba(255, 255, 255, 0.88);
+  --input-bg-focus: rgba(44, 44, 44, 0.04);
 
   /* Skill track */
-  --skill-track: rgba(60, 45, 28, 0.08);
+  --skill-track: rgba(0, 0, 0, 0.06);
 
-  /* Orbs shift to warm amber dust, misty mauve, and sea-fog slate */
-  --orb-1-color: #c8b490;
-  --orb-2-color: #b098b8;
-  --orb-3-color: #8ca0b4;
-  --orb-opacity: 0.32;
+  /* Orbs — light grays; present as depth, not as color */
+  --orb-1-color: #d8d8d8;
+  --orb-2-color: #cccccc;
+  --orb-3-color: #e0e0e0;
+  --orb-opacity: 0.45;
 
-  /* Cursor — deeper for visibility against parchment */
-  --cursor-color:     #3d5a7e;
-  --cursor-glow-core: rgba(61, 90, 126, 0.35);
-  --cursor-glow-edge: rgba(61, 90, 126, 0);
+  /* Cursor — near-black against the white surface */
+  --cursor-color:     #1a1a1a;
+  --cursor-glow-core: rgba(26, 26, 26, 0.28);
+  --cursor-glow-edge: rgba(26, 26, 26, 0);
 
   /* Modal */
-  --modal-backdrop-bg: rgba(52, 38, 18, 0.40);
-  --modal-glass-bg:    rgba(248, 244, 238, 0.92);
+  --modal-backdrop-bg: rgba(20, 20, 20, 0.50);
+  --modal-glass-bg:    rgba(252, 252, 252, 0.96);
 
-  /* Form status feedback — deeper for warm-parchment readability */
+  /* Form status feedback */
   --form-status-success: rgba(10, 130, 70, 0.90);
   --form-status-error:   rgba(200, 45, 60, 0.90);
 }
